@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS pings;
+
+DROP TYPE IF EXISTS ping_type;

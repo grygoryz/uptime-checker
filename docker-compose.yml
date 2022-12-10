@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14.1
+    environment:
+      - POSTGRES_DB=uptime_checker
+      - POSTGRES_USER=uptime_checker
+      - POSTGRES_PASSWORD=123123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:

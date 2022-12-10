@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS checks;
+
+DROP TYPE IF EXISTS check_status;

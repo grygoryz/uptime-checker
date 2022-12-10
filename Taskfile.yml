@@ -1,0 +1,61 @@
+version: '3'
+
+dotenv: ['.env']
+
+tasks:
+  default:
+    desc: Lists available commands
+    cmds:
+      - task: list
+
+  list:
+    desc: Lists available commands
+    cmds:
+      - task -l
+
+  services:run:
+    desc: Runs docker-compose services
+    cmds:
+      - docker-compose up -d
+
+  services:stop:
+    desc: Stops docker-compose services
+    cmds:
+      - docker-compose stop
+
+  run:
+    desc: Runs the server
+    cmds:
+      - go run cmd/server/main.go
+
+  migrate:create:
+    desc: Creates .sql migration files (Up and Down). Set name by appending with 'NAME=name_of_file'
+    cmds:
+      - migrate create -ext sql -dir database/migrations -format unix "{{.NAME}}"
+
+  migrate:
+    desc: Migrates UP the database
+    cmds:
+      - migrate -path database/migrations -database pgx://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME up
+
+  migrate:step:
+    desc: Migrates UP the database by 'n' step(s)
+    cmds:
+      - migrate -path database/migrations -database pgx://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME up "{{.n}}"
+
+  migrate:rollback:
+    desc: Rollback the database by 'n' step(s)
+    cmds:
+      - migrate -path database/migrations -database pgx://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME down "{{.n}}"
+
+  install:tools:
+    desc: Install all necessary tools
+    cmds:
+      - task: install:migrate
+
+  install:migrate:
+    desc: Install golang migration tool
+    cmds:
+      - curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
+      - mkdir -p ~/.local/bin
+      - mv migrate ~/.local/bin/migrate
