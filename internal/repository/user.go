@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
-	"gitlab.com/grygoryz/uptime-checker/internal/errors"
+	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
 )
 
 type User interface {

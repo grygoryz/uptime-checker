@@ -7,6 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/grygoryz/uptime-checker/config"
 	"gitlab.com/grygoryz/uptime-checker/internal/middleware"
+	validate "gitlab.com/grygoryz/uptime-checker/internal/validate"
 	"gitlab.com/grygoryz/uptime-checker/third_party/database"
 	"log"
 	"net/http"
@@ -20,6 +21,7 @@ type Server struct {
 	httpServer *http.Server
 	db         *sqlx.DB
 	cfg        config.Config
+	validator  *validate.Validator
 }
 
 func New() *Server {
@@ -31,8 +33,9 @@ func New() *Server {
 
 func (s *Server) Init() {
 	s.setGlobalMiddleware()
-	s.NewDatabase()
-	s.InitDomains()
+	s.newDatabase()
+	s.newValidator()
+	s.initDomains()
 }
 
 func (s *Server) setGlobalMiddleware() {
@@ -42,8 +45,12 @@ func (s *Server) setGlobalMiddleware() {
 	s.router.Use(middleware.CORS)
 }
 
-func (s *Server) NewDatabase() {
+func (s *Server) newDatabase() {
 	s.db = database.New(s.cfg)
+}
+
+func (s *Server) newValidator() {
+	s.validator = validate.New()
 }
 
 func (s *Server) Run() {

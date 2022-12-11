@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/rs/zerolog"
-	"gitlab.com/grygoryz/uptime-checker/internal/errors"
 	"gitlab.com/grygoryz/uptime-checker/internal/middleware"
+	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
 	"net/http"
 )
 
@@ -42,10 +42,12 @@ func Error(ctx context.Context, w http.ResponseWriter, err error) {
 
 }
 
+type response struct {
+	Message string `json:"message"`
+}
+
 func write(w http.ResponseWriter, msg string, log zerolog.Logger) {
-	m := map[string]string{
-		"message": msg,
-	}
+	m := response{msg}
 	body, err := json.Marshal(m)
 	if err != nil {
 		log.Error().Err(err).Send()

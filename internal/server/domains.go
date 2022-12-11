@@ -5,10 +5,11 @@ import (
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
 )
 
-func (s *Server) InitDomains() {
-	s.InitAuth()
+func (s *Server) initDomains() {
+	s.initAuth()
 }
 
-func (s *Server) InitAuth() {
-	auth.RegisterHandler(s.router, auth.NewService(repository.NewUser(s.db)))
+func (s *Server) initAuth() {
+	service := auth.NewService(repository.NewUser(s.db))
+	auth.RegisterHandler(s.router, service, s.validator)
 }
