@@ -5,6 +5,8 @@ import (
 	"log"
 )
 
+// @title Uptime Checker
+// @version 0.0.1
 func main() {
 	log.Println("Starting server...")
 	s := server.New()

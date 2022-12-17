@@ -26,6 +26,7 @@ tasks:
   run:
     desc: Runs the server
     cmds:
+      - task: swagger
       - go run cmd/server/main.go
 
   migrate:create:
@@ -48,10 +49,16 @@ tasks:
     cmds:
       - migrate -path database/migrations -database pgx://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME down "{{.n}}"
 
+  swagger:
+    desc: Generates Swagger page for API reference
+    cmds:
+      - swag init -g cmd/server/main.go
+
   install:tools:
     desc: Install all necessary tools
     cmds:
       - task: install:migrate
+      - task: install:swagger
 
   install:migrate:
     desc: Install golang migration tool
@@ -59,3 +66,8 @@ tasks:
       - curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
       - mkdir -p ~/.local/bin
       - mv migrate ~/.local/bin/migrate
+
+  install:swagger:
+    desc: Install swagger cli
+    cmds:
+      - go install github.com/swaggo/swag/cmd/swag@latest

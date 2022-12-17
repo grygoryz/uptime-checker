@@ -23,6 +23,13 @@ func RegisterHandler(router *chi.Mux, service Service, validator *validate.Valid
 	})
 }
 
+// SignIn checks user's credentials and sends api key
+// @Tags Auth
+// @Summary Sign in
+// @Accept json
+// @Produce json
+// @Success 200
+// @router /v1/auth/signin [put]
 func (h handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	log := middleware.LogEntry(r.Context())
 	log.Info().Msg("Hello!")
@@ -36,6 +43,14 @@ func (h handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	respond.Status(w, http.StatusOK)
 }
 
+// CreateUser creates user
+// @Tags Auth
+// @Summary Sign up
+// @Accept json
+// @Produce json
+// @Param User body CreateUserBody true "user data"
+// @Success 201
+// @router /v1/auth/signup [put]
 func (h handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var body CreateUserBody
 	err := json.NewDecoder(r.Body).Decode(&body)

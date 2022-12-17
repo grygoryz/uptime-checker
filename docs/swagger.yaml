@@ -1,0 +1,49 @@
+definitions:
+  auth.CreateUserBody:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 20
+        type: string
+    required:
+    - email
+    - password
+    type: object
+info:
+  contact: {}
+  title: Uptime Checker
+  version: 0.0.1
+paths:
+  /v1/auth/signin:
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Sign in
+      tags:
+      - Auth
+  /v1/auth/signup:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: user data
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/auth.CreateUserBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Sign up
+      tags:
+      - Auth
+swagger: "2.0"
