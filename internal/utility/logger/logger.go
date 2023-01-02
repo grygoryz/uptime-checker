@@ -1,4 +1,4 @@
-package middleware
+package logger
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var skipHeaders = []string{"Authorization"}
+var skipHeaders = []string{"Set-Cookie", "Cookie"}
 
 func Logger() func(next http.Handler) http.Handler {
 	hostname, err := os.Hostname()

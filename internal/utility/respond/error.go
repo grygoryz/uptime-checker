@@ -4,14 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/rs/zerolog"
-	"gitlab.com/grygoryz/uptime-checker/internal/middleware"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
+	"gitlab.com/grygoryz/uptime-checker/internal/utility/logger"
 	"net/http"
 )
 
 func Error(ctx context.Context, w http.ResponseWriter, err error) {
 	w.Header().Set("Content-Type", "application/json")
-	log := middleware.LogEntry(ctx)
+	log := logger.LogEntry(ctx)
 
 	switch e := err.(type) {
 	case errors.AppError:
@@ -27,6 +27,10 @@ func Error(ctx context.Context, w http.ResponseWriter, err error) {
 			status = http.StatusNotFound
 		case errors.Validation:
 			status = http.StatusBadRequest
+		case errors.Duplicated:
+			status = http.StatusConflict
+		case errors.Unauthorized:
+			status = http.StatusUnauthorized
 		default:
 			status = http.StatusInternalServerError
 		}

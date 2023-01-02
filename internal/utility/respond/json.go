@@ -3,7 +3,7 @@ package respond
 import (
 	"context"
 	"encoding/json"
-	"gitlab.com/grygoryz/uptime-checker/internal/middleware"
+	"gitlab.com/grygoryz/uptime-checker/internal/utility/logger"
 	"net/http"
 )
 
@@ -29,7 +29,7 @@ func JSON(ctx context.Context, w http.ResponseWriter, statusCode int, payload in
 
 	_, err = w.Write(data)
 	if err != nil {
-		log := middleware.LogEntry(ctx)
+		log := logger.LogEntry(ctx)
 		log.Error().Err(err).Send()
 	}
 }

@@ -16,6 +16,28 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/auth/check": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Check user data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.CheckResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/auth/signin": {
             "put": {
                 "consumes": [
@@ -28,6 +50,36 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "Sign in",
+                "parameters": [
+                    {
+                        "description": "user credentials",
+                        "name": "Credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.SignInBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/auth/signout": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Sign out",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -54,7 +106,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.CreateUserBody"
+                            "$ref": "#/definitions/auth.SignUpBody"
                         }
                     }
                 ],
@@ -67,7 +119,18 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "auth.CreateUserBody": {
+        "auth.CheckResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "auth.SignInBody": {
             "type": "object",
             "required": [
                 "email",
@@ -75,11 +138,31 @@ const docTemplate = `{
             ],
             "properties": {
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 320
                 },
                 "password": {
                     "type": "string",
-                    "minLength": 20
+                    "maxLength": 128,
+                    "minLength": 8
+                }
+            }
+        },
+        "auth.SignUpBody": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "maxLength": 320
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 8
                 }
             }
         }

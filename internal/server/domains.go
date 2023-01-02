@@ -13,8 +13,9 @@ func (s *Server) initDomains() {
 }
 
 func (s *Server) initAuth() {
-	service := auth.NewService(repository.NewUser(s.db))
-	auth.RegisterHandler(s.router, service, s.validator)
+	session := repository.NewSession(s.redis)
+	service := auth.NewService(repository.NewRegistry(s.db), session)
+	auth.RegisterHandler(s.router, service, s.validator, session)
 }
 
 func (s *Server) initSwagger() {

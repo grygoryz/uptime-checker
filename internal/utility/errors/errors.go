@@ -7,6 +7,8 @@ const (
 	Forbidden
 	Validation
 	NotExist
+	Duplicated
+	Unauthorized
 )
 
 type AppError struct {

@@ -4,11 +4,14 @@ import (
 	"context"
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	goredis "github.com/go-redis/redis/v9"
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/grygoryz/uptime-checker/config"
 	"gitlab.com/grygoryz/uptime-checker/internal/middleware"
-	validate "gitlab.com/grygoryz/uptime-checker/internal/validate"
+	"gitlab.com/grygoryz/uptime-checker/internal/utility/logger"
+	"gitlab.com/grygoryz/uptime-checker/internal/validate"
 	"gitlab.com/grygoryz/uptime-checker/third_party/database"
+	"gitlab.com/grygoryz/uptime-checker/third_party/redis"
 	"log"
 	"net/http"
 	"os"
@@ -19,9 +22,12 @@ import (
 type Server struct {
 	router     *chi.Mux
 	httpServer *http.Server
-	db         *sqlx.DB
-	cfg        config.Config
-	validator  *validate.Validator
+
+	db    *sqlx.DB
+	redis *goredis.Client
+
+	cfg       config.Config
+	validator *validate.Validator
 }
 
 func New() *Server {
@@ -34,19 +40,24 @@ func New() *Server {
 func (s *Server) Init() {
 	s.setGlobalMiddleware()
 	s.newDatabase()
+	s.newRedis()
 	s.newValidator()
 	s.initDomains()
 }
 
 func (s *Server) setGlobalMiddleware() {
 	s.router.Use(chiMiddleware.RequestID)
-	s.router.Use(middleware.Logger())
+	s.router.Use(logger.Logger())
 	s.router.Use(chiMiddleware.Recoverer)
 	s.router.Use(middleware.CORS)
 }
 
 func (s *Server) newDatabase() {
 	s.db = database.New(s.cfg)
+}
+
+func (s *Server) newRedis() {
+	s.redis = redis.New(s.cfg)
 }
 
 func (s *Server) newValidator() {

@@ -1,10 +1,16 @@
 package auth
 
-type CreateUserBody struct {
-	Email    string `json:"email" validate:"required"`
-	Password string `json:"password" validate:"required,min=20"`
+type SignUpBody struct {
+	Email    string `json:"email" validate:"required,max=320,email"`
+	Password string `json:"password" validate:"required,min=8,max=128"`
 }
 
-type CreateUserParams struct {
-	FirstName string `json:"firstName" validate:"min=20"`
+type SignInBody struct {
+	Email    string `json:"email" validate:"required,max=320,email"`
+	Password string `json:"password" validate:"required,min=8,max=128"`
+}
+
+type CheckResponse struct {
+	Id    int    `json:"id"`
+	Email string `json:"email"`
 }

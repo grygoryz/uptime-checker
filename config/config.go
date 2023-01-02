@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Api      Api
 	Database Database
+	Redis    Redis
 }
 
 func New() Config {
@@ -19,5 +20,6 @@ func New() Config {
 	return Config{
 		Api:      ApiCfg(),
 		Database: DatabaseCfg(),
+		Redis:    RedisCfg(),
 	}
 }

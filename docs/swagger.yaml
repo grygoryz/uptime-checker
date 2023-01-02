@@ -1,10 +1,32 @@
 definitions:
-  auth.CreateUserBody:
+  auth.CheckResponse:
     properties:
       email:
         type: string
+      id:
+        type: integer
+    type: object
+  auth.SignInBody:
+    properties:
+      email:
+        maxLength: 320
+        type: string
       password:
-        minLength: 20
+        maxLength: 128
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.SignUpBody:
+    properties:
+      email:
+        maxLength: 320
+        type: string
+      password:
+        maxLength: 128
+        minLength: 8
         type: string
     required:
     - email
@@ -15,7 +37,40 @@ info:
   title: Uptime Checker
   version: 0.0.1
 paths:
+  /v1/auth/check:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.CheckResponse'
+      summary: Check user data
+      tags:
+      - Auth
   /v1/auth/signin:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: user credentials
+        in: body
+        name: Credentials
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignInBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Sign in
+      tags:
+      - Auth
+  /v1/auth/signout:
     put:
       consumes:
       - application/json
@@ -24,7 +79,7 @@ paths:
       responses:
         "200":
           description: OK
-      summary: Sign in
+      summary: Sign out
       tags:
       - Auth
   /v1/auth/signup:
@@ -37,7 +92,7 @@ paths:
         name: User
         required: true
         schema:
-          $ref: '#/definitions/auth.CreateUserBody'
+          $ref: '#/definitions/auth.SignUpBody'
       produces:
       - application/json
       responses:
