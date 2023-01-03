@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	goerrors "errors"
+	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
@@ -12,8 +13,7 @@ import (
 
 type User interface {
 	Create(ctx context.Context, email string, password string) (int, error)
-	GetByEmail(ctx context.Context, email string) (*entity.User, error)
-	Get(ctx context.Context, id int) (*entity.User, error)
+	GetByEmail(ctx context.Context, email string) (entity.User, error)
 }
 
 type userRepository struct {
@@ -33,7 +33,7 @@ func (r *userRepository) Create(ctx context.Context, email string, password stri
 		Scan(&id)
 	if err != nil {
 		var pgErr *pgconn.PgError
-		if goerrors.As(err, &pgErr) && pgErr.Code == "23505" {
+		if goerrors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
 			return 0, errors.E(errors.Duplicated, "User with this email exists already")
 		}
 
@@ -43,7 +43,7 @@ func (r *userRepository) Create(ctx context.Context, email string, password stri
 	return id, nil
 }
 
-func (r *userRepository) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
+func (r *userRepository) GetByEmail(ctx context.Context, email string) (entity.User, error) {
 	q := getQueryable(ctx, r.db)
 	user := entity.User{}
 	err := q.GetContext(ctx, &user, "SELECT id, password FROM users WHERE email = $1", email)
@@ -51,22 +51,8 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*entity.
 		if err == sql.ErrNoRows {
 			err = errors.E(errors.NotExist, "User not found")
 		}
-		return nil, err
+		return entity.User{}, err
 	}
 
-	return &user, nil
-}
-
-func (r *userRepository) Get(ctx context.Context, id int) (*entity.User, error) {
-	q := getQueryable(ctx, r.db)
-	user := entity.User{}
-	err := q.GetContext(ctx, &user, "SELECT email, password FROM users WHERE id = $1", id)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			err = errors.E(errors.NotExist, "User not found")
-		}
-		return nil, err
-	}
-
-	return &user, nil
+	return user, nil
 }

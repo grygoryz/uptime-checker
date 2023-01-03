@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/grygoryz/uptime-checker/config"
 	"log"

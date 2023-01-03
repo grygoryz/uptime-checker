@@ -11,6 +11,6 @@ type Channel struct {
 	Id         int    `db:"id"`
 	Kind       string `db:"kind"`
 	Email      string `db:"email"`
-	WebhookUrl string `db:"webhook_url"`
+	WebhookURL string `db:"webhook_url"`
 	UserId     int    `db:"user_id"`
 }

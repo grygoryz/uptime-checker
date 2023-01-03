@@ -12,7 +12,7 @@ type Database struct {
 	Name     string `required:"true"`
 }
 
-func DatabaseCfg() Database {
+func databaseCfg() Database {
 	var db Database
 	envconfig.MustProcess("DB", &db)
 

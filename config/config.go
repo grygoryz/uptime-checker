@@ -18,8 +18,8 @@ func New() Config {
 	}
 
 	return Config{
-		Api:      ApiCfg(),
-		Database: DatabaseCfg(),
-		Redis:    RedisCfg(),
+		Api:      apiCfg(),
+		Database: databaseCfg(),
+		Redis:    redisCfg(),
 	}
 }

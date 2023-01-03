@@ -91,9 +91,9 @@ func getRequestChildLogger(r *http.Request, l zerolog.Logger) zerolog.Logger {
 	if r.TLS != nil {
 		scheme = "https"
 	}
-	requestUrl := fmt.Sprintf("%s://%s%s", scheme, r.Host, r.RequestURI)
+	requestURL := fmt.Sprintf("%s://%s%s", scheme, r.Host, r.RequestURI)
 
-	dict := zerolog.Dict().Str("url", requestUrl).
+	dict := zerolog.Dict().Str("url", requestURL).
 		Str("method", r.Method).
 		Str("path", r.URL.Path).
 		Str("remoteIp", r.RemoteAddr).

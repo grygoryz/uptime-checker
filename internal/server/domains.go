@@ -2,7 +2,6 @@ package server
 
 import (
 	httpSwagger "github.com/swaggo/http-swagger"
-	_ "gitlab.com/grygoryz/uptime-checker/docs"
 	"gitlab.com/grygoryz/uptime-checker/internal/domain/auth"
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
 )

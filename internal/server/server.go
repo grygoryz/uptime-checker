@@ -98,6 +98,12 @@ func (s *Server) gracefulShutdown() error {
 			log.Printf("Database shutdown failed: %+v\n", err)
 		}
 		log.Println("Database shutdown success.")
+
+		if err := s.redis.Close(); err != nil {
+			log.Printf("Redis shutdown failed: %+v\n", err)
+		}
+		log.Println("Redis shutdown success.")
+
 		// TODO: close rabbit. smtp
 	}()
 

@@ -9,7 +9,7 @@ type Redis struct {
 	Port string `required:"true"`
 }
 
-func RedisCfg() Redis {
+func redisCfg() Redis {
 	var redis Redis
 	envconfig.MustProcess("REDIS", &redis)
 

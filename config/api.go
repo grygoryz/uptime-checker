@@ -11,7 +11,7 @@ type Api struct {
 	GracefulTimeout time.Duration `default:"20s" split_words:"true"`
 }
 
-func ApiCfg() Api {
+func apiCfg() Api {
 	var api Api
 	envconfig.MustProcess("API", &api)
 
