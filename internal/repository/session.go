@@ -45,7 +45,7 @@ func (s *Session) Get(ctx context.Context, id string) (UserSession, error) {
 	val, err := s.redis.Get(ctx, sessionKey(id)).Bytes()
 	if err != nil {
 		if err == redis.Nil {
-			err = errors.E(errors.NotExist, "Session not found")
+			err = errors.E(errors.NotExist, "session not found")
 		}
 		return UserSession{}, err
 	}

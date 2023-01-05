@@ -43,7 +43,7 @@
                 "parameters": [
                     {
                         "description": "user credentials",
-                        "name": "Credentials",
+                        "name": "credentials",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -92,7 +92,7 @@
                 "parameters": [
                     {
                         "description": "user data",
-                        "name": "User",
+                        "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -106,11 +106,134 @@
                     }
                 }
             }
+        },
+        "/v1/channels": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Get channels",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/channel.GetChannelsResponseItem"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Create channel",
+                "parameters": [
+                    {
+                        "description": "channel data",
+                        "name": "channel",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/channel.CreateChannelBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/channel.CreateChannelResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/channels/{id}": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Update channel",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "channel id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "channel data",
+                        "name": "channel",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/channel.UpdateChannelBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Delete channel",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "channel id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
         }
     },
     "definitions": {
         "auth.CheckResponse": {
             "type": "object",
+            "required": [
+                "email",
+                "id"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -155,6 +278,99 @@
                     "minLength": 8
                 }
             }
+        },
+        "channel.CreateChannelBody": {
+            "type": "object",
+            "required": [
+                "kind"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "kind": {
+                    "enum": [
+                        "email",
+                        "webhook"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entity.ChannelKind"
+                        }
+                    ]
+                },
+                "webhookURL": {
+                    "type": "string"
+                }
+            }
+        },
+        "channel.CreateChannelResponse": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "channel.GetChannelsResponseItem": {
+            "type": "object",
+            "required": [
+                "id",
+                "kind"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "kind": {
+                    "$ref": "#/definitions/entity.ChannelKind"
+                },
+                "webhookURL": {
+                    "type": "string"
+                }
+            }
+        },
+        "channel.UpdateChannelBody": {
+            "type": "object",
+            "required": [
+                "kind"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "kind": {
+                    "enum": [
+                        "email",
+                        "webhook"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entity.ChannelKind"
+                        }
+                    ]
+                },
+                "webhookURL": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.ChannelKind": {
+            "type": "string",
+            "enum": [
+                "email",
+                "webhook"
+            ],
+            "x-enum-varnames": [
+                "EmailChannel",
+                "WebhookChannel"
+            ]
         }
     }
 }

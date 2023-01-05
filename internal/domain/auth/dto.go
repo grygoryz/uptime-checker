@@ -11,6 +11,6 @@ type SignInBody struct {
 }
 
 type CheckResponse struct {
-	Id    int    `json:"id"`
-	Email string `json:"email"`
+	Id    int    `json:"id" validate:"required"`
+	Email string `json:"email" validate:"required"`
 }

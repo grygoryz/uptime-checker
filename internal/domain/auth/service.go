@@ -53,7 +53,7 @@ func (svc *service) SignIn(ctx context.Context, user SignInBody) (string, error)
 
 	err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password))
 	if err != nil {
-		return "", errors.E(errors.Unauthorized, "Credentials are not valid")
+		return "", errors.E(errors.Unauthorized, "credentials are not valid")
 	}
 
 	id, err := svc.session.Create(ctx, repository.UserSession{Id: dbUser.Id, Email: user.Email})

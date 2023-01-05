@@ -34,7 +34,7 @@ func (r *userRepository) Create(ctx context.Context, email string, password stri
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if goerrors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
-			return 0, errors.E(errors.Duplicated, "User with this email exists already")
+			return 0, errors.E(errors.Duplicated, "user with this email exists already")
 		}
 
 		return 0, err
@@ -49,7 +49,7 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (entity.U
 	err := q.GetContext(ctx, &user, "SELECT id, password FROM users WHERE email = $1", email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			err = errors.E(errors.NotExist, "User not found")
+			err = errors.E(errors.NotExist, "user not found")
 		}
 		return entity.User{}, err
 	}

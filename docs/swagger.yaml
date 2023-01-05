@@ -5,6 +5,9 @@ definitions:
         type: string
       id:
         type: integer
+    required:
+    - email
+    - id
     type: object
   auth.SignInBody:
     properties:
@@ -32,6 +35,65 @@ definitions:
     - email
     - password
     type: object
+  channel.CreateChannelBody:
+    properties:
+      email:
+        type: string
+      kind:
+        allOf:
+        - $ref: '#/definitions/entity.ChannelKind'
+        enum:
+        - email
+        - webhook
+      webhookURL:
+        type: string
+    required:
+    - kind
+    type: object
+  channel.CreateChannelResponse:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  channel.GetChannelsResponseItem:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      kind:
+        $ref: '#/definitions/entity.ChannelKind'
+      webhookURL:
+        type: string
+    required:
+    - id
+    - kind
+    type: object
+  channel.UpdateChannelBody:
+    properties:
+      email:
+        type: string
+      kind:
+        allOf:
+        - $ref: '#/definitions/entity.ChannelKind'
+        enum:
+        - email
+        - webhook
+      webhookURL:
+        type: string
+    required:
+    - kind
+    type: object
+  entity.ChannelKind:
+    enum:
+    - email
+    - webhook
+    type: string
+    x-enum-varnames:
+    - EmailChannel
+    - WebhookChannel
 info:
   contact: {}
   title: Uptime Checker
@@ -58,7 +120,7 @@ paths:
       parameters:
       - description: user credentials
         in: body
-        name: Credentials
+        name: credentials
         required: true
         schema:
           $ref: '#/definitions/auth.SignInBody'
@@ -89,7 +151,7 @@ paths:
       parameters:
       - description: user data
         in: body
-        name: User
+        name: user
         required: true
         schema:
           $ref: '#/definitions/auth.SignUpBody'
@@ -101,4 +163,81 @@ paths:
       summary: Sign up
       tags:
       - Auth
+  /v1/channels:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/channel.GetChannelsResponseItem'
+            type: array
+      summary: Get channels
+      tags:
+      - Channels
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: channel data
+        in: body
+        name: channel
+        required: true
+        schema:
+          $ref: '#/definitions/channel.CreateChannelBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/channel.CreateChannelResponse'
+      summary: Create channel
+      tags:
+      - Channels
+  /v1/channels/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: channel id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Delete channel
+      tags:
+      - Channels
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: channel id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: channel data
+        in: body
+        name: channel
+        required: true
+        schema:
+          $ref: '#/definitions/channel.UpdateChannelBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update channel
+      tags:
+      - Channels
 swagger: "2.0"

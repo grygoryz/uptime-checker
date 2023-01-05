@@ -1,10 +1,10 @@
 package auth
 
 import (
-	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"gitlab.com/grygoryz/uptime-checker/internal/middleware"
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
+	"gitlab.com/grygoryz/uptime-checker/internal/utility/request"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/respond"
 	"gitlab.com/grygoryz/uptime-checker/internal/validate"
 	"net/http"
@@ -34,18 +34,11 @@ func RegisterHandler(router *chi.Mux, service Service, validator *validate.Valid
 // @Summary Sign up
 // @Accept json
 // @Produce json
-// @Param User body SignUpBody true "user data"
+// @Param user body SignUpBody true "user data"
 // @Success 201
 // @router /v1/auth/signup [put]
 func (h handler) SignUp(w http.ResponseWriter, r *http.Request) {
-	var body SignUpBody
-	err := json.NewDecoder(r.Body).Decode(&body)
-	if err != nil {
-		respond.Error(r.Context(), w, err)
-		return
-	}
-
-	err = h.validator.Struct(body)
+	body, err := request.Body[SignUpBody](r, h.validator)
 	if err != nil {
 		respond.Error(r.Context(), w, err)
 		return
@@ -65,18 +58,11 @@ func (h handler) SignUp(w http.ResponseWriter, r *http.Request) {
 // @Summary Sign in
 // @Accept json
 // @Produce json
-// @Param Credentials body SignInBody true "user credentials"
+// @Param credentials body SignInBody true "user credentials"
 // @Success 200
 // @router /v1/auth/signin [put]
 func (h handler) SignIn(w http.ResponseWriter, r *http.Request) {
-	var body SignInBody
-	err := json.NewDecoder(r.Body).Decode(&body)
-	if err != nil {
-		respond.Error(r.Context(), w, err)
-		return
-	}
-
-	err = h.validator.Struct(body)
+	body, err := request.Body[SignInBody](r, h.validator)
 	if err != nil {
 		respond.Error(r.Context(), w, err)
 		return
@@ -93,6 +79,7 @@ func (h handler) SignIn(w http.ResponseWriter, r *http.Request) {
 		Value:    id,
 		Expires:  time.Now().Add(168 * time.Hour),
 		HttpOnly: true,
+		Path:     "/",
 	})
 
 	respond.Status(w, http.StatusOK)

@@ -24,7 +24,7 @@ func Auth(session *repository.Session) func(next http.Handler) http.Handler {
 			sessionCookie, err := r.Cookie(SessionCookieName)
 			if err != nil {
 				if err == http.ErrNoCookie {
-					err = errors.E(errors.Unauthorized, "Cookie not found", err)
+					err = errors.E(errors.Unauthorized, "cookie not found", err)
 				}
 				respond.Error(r.Context(), w, err)
 				return
