@@ -110,6 +110,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/auth.CheckResponse'
+      security:
+      - cookieAuth: []
       summary: Check user data
       tags:
       - Auth
@@ -117,6 +119,7 @@ paths:
     put:
       consumes:
       - application/json
+      description: Sets cookie "sessionId" on response
       parameters:
       - description: user credentials
         in: body
@@ -141,6 +144,8 @@ paths:
       responses:
         "200":
           description: OK
+      security:
+      - cookieAuth: []
       summary: Sign out
       tags:
       - Auth
@@ -176,6 +181,8 @@ paths:
             items:
               $ref: '#/definitions/channel.GetChannelsResponseItem'
             type: array
+      security:
+      - cookieAuth: []
       summary: Get channels
       tags:
       - Channels
@@ -196,6 +203,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/channel.CreateChannelResponse'
+      security:
+      - cookieAuth: []
       summary: Create channel
       tags:
       - Channels
@@ -214,6 +223,8 @@ paths:
       responses:
         "200":
           description: OK
+      security:
+      - cookieAuth: []
       summary: Delete channel
       tags:
       - Channels
@@ -237,7 +248,14 @@ paths:
       responses:
         "200":
           description: OK
+      security:
+      - cookieAuth: []
       summary: Update channel
       tags:
       - Channels
+securityDefinitions:
+  cookieAuth:
+    in: cookie
+    name: sessionId
+    type: apiKey
 swagger: "2.0"

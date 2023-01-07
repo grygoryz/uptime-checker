@@ -9,6 +9,9 @@ import (
 
 // @title Uptime Checker
 // @version 0.0.1
+// @securitydefinitions.apikey cookieAuth
+// @in                         cookie
+// @name                       sessionId
 func main() {
 	log.Println("Starting server...")
 	s := server.New()

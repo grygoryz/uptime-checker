@@ -56,6 +56,7 @@ func (h handler) SignUp(w http.ResponseWriter, r *http.Request) {
 // SignIn checks user's credentials and sends session id in cookie
 // @Tags Auth
 // @Summary Sign in
+// @Description Sets cookie "sessionId" on response
 // @Accept json
 // @Produce json
 // @Param credentials body SignInBody true "user credentials"
@@ -88,6 +89,7 @@ func (h handler) SignIn(w http.ResponseWriter, r *http.Request) {
 // SignOut destroys user's session
 // @Tags Auth
 // @Summary Sign out
+// @Security cookieAuth
 // @Accept json
 // @Produce json
 // @Success 200
@@ -115,6 +117,7 @@ func (h handler) SignOut(w http.ResponseWriter, r *http.Request) {
 // Check returns user session data
 // @Tags Auth
 // @Summary Check user data
+// @Security cookieAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} CheckResponse

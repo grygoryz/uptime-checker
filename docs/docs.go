@@ -18,6 +18,11 @@ const docTemplate = `{
     "paths": {
         "/v1/auth/check": {
             "get": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -40,6 +45,7 @@ const docTemplate = `{
         },
         "/v1/auth/signin": {
             "put": {
+                "description": "Sets cookie \"sessionId\" on response",
                 "consumes": [
                     "application/json"
                 ],
@@ -70,6 +76,11 @@ const docTemplate = `{
         },
         "/v1/auth/signout": {
             "put": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -119,6 +130,11 @@ const docTemplate = `{
         },
         "/v1/channels": {
             "get": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -142,6 +158,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -175,6 +196,11 @@ const docTemplate = `{
         },
         "/v1/channels/{id}": {
             "put": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -210,6 +236,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -381,6 +412,13 @@ const docTemplate = `{
                 "EmailChannel",
                 "WebhookChannel"
             ]
+        }
+    },
+    "securityDefinitions": {
+        "cookieAuth": {
+            "type": "apiKey",
+            "name": "sessionId",
+            "in": "cookie"
         }
     }
 }`

@@ -33,6 +33,7 @@ func RegisterHandler(router *chi.Mux, service Service, validator *validate.Valid
 // CreateChannel creates channel
 // @Tags Channels
 // @Summary Create channel
+// @Security cookieAuth
 // @Accept json
 // @Produce json
 // @Param channel body CreateChannelBody true "channel data"
@@ -63,6 +64,7 @@ func (h handler) CreateChannel(w http.ResponseWriter, r *http.Request) {
 // UpdateChannel updates channel
 // @Tags Channels
 // @Summary Update channel
+// @Security cookieAuth
 // @Accept json
 // @Produce json
 // @Param id path int true "channel id"
@@ -101,6 +103,7 @@ func (h handler) UpdateChannel(w http.ResponseWriter, r *http.Request) {
 // GetChannels returns channels
 // @Tags Channels
 // @Summary Get channels
+// @Security cookieAuth
 // @Accept json
 // @Produce json
 // @Success 200 {array} GetChannelsResponseItem
@@ -128,6 +131,7 @@ func (h handler) GetChannels(w http.ResponseWriter, r *http.Request) {
 // DeleteChannel deletes channel by id
 // @Tags Channels
 // @Summary Delete channel
+// @Security cookieAuth
 // @Accept json
 // @Produce json
 // @Param id path int true "channel id"
