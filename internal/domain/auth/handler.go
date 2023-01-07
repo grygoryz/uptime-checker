@@ -78,7 +78,7 @@ func (h handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     middleware.SessionCookieName,
 		Value:    id,
-		Expires:  time.Now().Add(168 * time.Hour),
+		Expires:  time.Now().Add(repository.SessionTTL),
 		HttpOnly: true,
 		Path:     "/",
 	})

@@ -6,6 +6,7 @@ import (
 	"github.com/go-redis/redis/v9"
 	"github.com/google/uuid"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
+	"time"
 )
 
 type Session struct {
@@ -21,6 +22,8 @@ type UserSession struct {
 	Email string `json:"email"`
 }
 
+const SessionTTL = time.Hour * 168
+
 func (s *Session) Create(ctx context.Context, data UserSession) (string, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {
@@ -33,7 +36,7 @@ func (s *Session) Create(ctx context.Context, data UserSession) (string, error) 
 	}
 
 	idStr := id.String()
-	err = s.redis.Set(ctx, sessionKey(idStr), value, 0).Err()
+	err = s.redis.Set(ctx, sessionKey(idStr), value, SessionTTL).Err()
 	if err != nil {
 		return "", err
 	}
