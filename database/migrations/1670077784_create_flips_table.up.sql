@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS flips
 (
     "to"     flip_state  NOT NULL,
     date     timestamptz NOT NULL,
-    check_id int,
+    check_id uuid NOT NULL,
     FOREIGN KEY (check_id) REFERENCES checks (id) ON DELETE CASCADE ON UPDATE CASCADE
 );

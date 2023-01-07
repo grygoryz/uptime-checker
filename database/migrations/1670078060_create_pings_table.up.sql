@@ -10,6 +10,6 @@ CREATE TABLE IF NOT EXISTS pings
     method varchar(4) NOT NULL,
     duration int,
     body varchar(10000),
-    check_id int NOT NULL,
+    check_id uuid NOT NULL,
     FOREIGN KEY (check_id) REFERENCES checks (id) ON DELETE CASCADE ON UPDATE CASCADE
 );

@@ -2,7 +2,7 @@ CREATE TYPE check_status AS ENUM ('new', 'started', 'up', 'down', 'paused');
 
 CREATE TABLE IF NOT EXISTS checks
 (
-    id           int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id           uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     name         varchar(255) NOT NULL,
     description  varchar(2000),
     interval     integer      NOT NULL,
