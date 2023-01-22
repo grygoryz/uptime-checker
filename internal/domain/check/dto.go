@@ -18,7 +18,7 @@ type Check struct {
 	Channels    []int64            `json:"channels" validate:"required"`
 }
 
-type GetCheckParam struct {
+type CheckIdParam struct {
 	Id string `json:"id" validate:"uuid4"`
 }
 
@@ -32,8 +32,4 @@ type CreateCheckBody struct {
 
 type CreateCheckResponse struct {
 	Id string `json:"id" validate:"required"`
-}
-
-type UpdateCheckParam struct {
-	Id string `json:"id" validate:"uuid4"`
 }

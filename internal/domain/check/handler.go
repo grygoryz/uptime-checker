@@ -68,7 +68,7 @@ func (h handler) GetChecks(w http.ResponseWriter, r *http.Request) {
 // @router /v1/checks/{id} [get]
 func (h handler) GetCheck(w http.ResponseWriter, r *http.Request) {
 	checkId := chi.URLParam(r, "id")
-	err := h.validator.Struct(GetCheckParam{Id: checkId})
+	err := h.validator.Struct(CheckIdParam{Id: checkId})
 	if err != nil {
 		respond.Error(r.Context(), w, err)
 		return
@@ -128,7 +128,7 @@ func (h handler) CreateCheck(w http.ResponseWriter, r *http.Request) {
 // @router /v1/checks/{id} [put]
 func (h handler) UpdateCheck(w http.ResponseWriter, r *http.Request) {
 	checkId := chi.URLParam(r, "id")
-	err := h.validator.Struct(UpdateCheckParam{Id: checkId})
+	err := h.validator.Struct(CheckIdParam{Id: checkId})
 	if err != nil {
 		respond.Error(r.Context(), w, err)
 		return
@@ -142,7 +142,7 @@ func (h handler) UpdateCheck(w http.ResponseWriter, r *http.Request) {
 
 	user := middleware.User(r.Context())
 	err = h.service.UpdateCheck(r.Context(), entity.UpdateCheck{
-		CheckId:     checkId,
+		Id:          checkId,
 		UserId:      user.Id,
 		Name:        body.Name,
 		Description: body.Description,
@@ -168,7 +168,7 @@ func (h handler) UpdateCheck(w http.ResponseWriter, r *http.Request) {
 // @router /v1/checks/{id} [delete]
 func (h handler) DeleteCheck(w http.ResponseWriter, r *http.Request) {
 	checkId := chi.URLParam(r, "id")
-	err := h.validator.Struct(UpdateCheckParam{Id: checkId})
+	err := h.validator.Struct(CheckIdParam{Id: checkId})
 	if err != nil {
 		respond.Error(r.Context(), w, err)
 		return
@@ -176,8 +176,8 @@ func (h handler) DeleteCheck(w http.ResponseWriter, r *http.Request) {
 
 	user := middleware.User(r.Context())
 	err = h.service.DeleteCheck(r.Context(), entity.DeleteCheck{
-		CheckId: checkId,
-		UserId:  user.Id,
+		Id:     checkId,
+		UserId: user.Id,
 	})
 	if err != nil {
 		respond.Error(r.Context(), w, err)
@@ -198,7 +198,7 @@ func (h handler) DeleteCheck(w http.ResponseWriter, r *http.Request) {
 // @router /v1/checks/{id}/pause [put]
 func (h handler) PauseCheck(w http.ResponseWriter, r *http.Request) {
 	checkId := chi.URLParam(r, "id")
-	err := h.validator.Struct(UpdateCheckParam{Id: checkId})
+	err := h.validator.Struct(CheckIdParam{Id: checkId})
 	if err != nil {
 		respond.Error(r.Context(), w, err)
 		return
@@ -225,7 +225,7 @@ func (h handler) PauseCheck(w http.ResponseWriter, r *http.Request) {
 // @router /v1/checks/{id}/resume [put]
 func (h handler) ResumeCheck(w http.ResponseWriter, r *http.Request) {
 	checkId := chi.URLParam(r, "id")
-	err := h.validator.Struct(UpdateCheckParam{Id: checkId})
+	err := h.validator.Struct(CheckIdParam{Id: checkId})
 	if err != nil {
 		respond.Error(r.Context(), w, err)
 		return

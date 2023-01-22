@@ -121,7 +121,7 @@ func (r *checkRepository) Update(ctx context.Context, check entity.UpdateCheck) 
 
 	query := `UPDATE checks SET "name" = $1, description = $2, "interval" = $3, grace = $4 WHERE id = $5 AND used_id = $6`
 	result, err := q.ExecContext(
-		ctx, query, check.Name, check.Description, check.Interval, check.Grace, check.CheckId, check.UserId,
+		ctx, query, check.Name, check.Description, check.Interval, check.Grace, check.Id, check.UserId,
 	)
 	if err != nil {
 		return err
@@ -143,7 +143,7 @@ func (r *checkRepository) Delete(ctx context.Context, check entity.DeleteCheck) 
 	q := getQueryable(ctx, r.db)
 
 	query := "DELETE FROM checks WHERE id = $1 AND used_id = $2"
-	result, err := q.ExecContext(ctx, query, check.CheckId, check.UserId)
+	result, err := q.ExecContext(ctx, query, check.Id, check.UserId)
 	if err != nil {
 		return err
 	}
@@ -164,7 +164,7 @@ func (r *checkRepository) SetStatus(ctx context.Context, check entity.SetCheckSt
 	q := getQueryable(ctx, r.db)
 
 	query := `UPDATE checks SET "status" = $1 WHERE id = $2 AND used_id = $3`
-	result, err := q.ExecContext(ctx, query, check.Status, check.CheckId, check.UserId)
+	result, err := q.ExecContext(ctx, query, check.Status, check.Id, check.UserId)
 	if err != nil {
 		return err
 	}
@@ -191,7 +191,7 @@ func (r *checkRepository) AddChannels(ctx context.Context, params entity.AddChan
 
 	rows := make([]checkChannel, len(params.Channels))
 	for i, channelId := range params.Channels {
-		rows[i] = checkChannel{CheckId: params.CheckId, ChannelId: channelId}
+		rows[i] = checkChannel{CheckId: params.Id, ChannelId: channelId}
 	}
 
 	query := "INSERT INTO checks_channels (check_id, channel_id) VALUES (:check_id, :channel_id)"

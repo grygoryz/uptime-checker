@@ -41,7 +41,7 @@ func (s *service) CreateCheck(ctx context.Context, check entity.CreateCheck, cha
 			return nil, err
 		}
 
-		err = s.r.Check.AddChannels(ctx, entity.AddChannels{CheckId: id, Channels: channels})
+		err = s.r.Check.AddChannels(ctx, entity.AddChannels{Id: id, Channels: channels})
 		if err != nil {
 			return nil, err
 		}
@@ -59,12 +59,12 @@ func (s *service) UpdateCheck(ctx context.Context, check entity.UpdateCheck, cha
 			return nil, err
 		}
 
-		err = s.r.Check.DeleteChannels(ctx, check.CheckId)
+		err = s.r.Check.DeleteChannels(ctx, check.Id)
 		if err != nil {
 			return nil, err
 		}
 
-		err = s.r.Check.AddChannels(ctx, entity.AddChannels{CheckId: check.CheckId, Channels: channels})
+		err = s.r.Check.AddChannels(ctx, entity.AddChannels{Id: check.Id, Channels: channels})
 		if err != nil {
 			return nil, err
 		}
@@ -81,16 +81,16 @@ func (s *service) DeleteCheck(ctx context.Context, check entity.DeleteCheck) err
 
 func (s *service) PauseCheck(ctx context.Context, checkId string, userId int) error {
 	return s.r.Check.SetStatus(ctx, entity.SetCheckStatus{
-		CheckId: checkId,
-		UserId:  userId,
-		Status:  entity.CheckPaused,
+		Id:     checkId,
+		UserId: userId,
+		Status: entity.CheckPaused,
 	})
 }
 
 func (s *service) ResumeCheck(ctx context.Context, checkId string, userId int) error {
 	return s.r.Check.SetStatus(ctx, entity.SetCheckStatus{
-		CheckId: checkId,
-		UserId:  userId,
-		Status:  entity.CheckNew,
+		Id:     checkId,
+		UserId: userId,
+		Status: entity.CheckNew,
 	})
 }

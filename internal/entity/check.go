@@ -42,7 +42,7 @@ type CreateCheck struct {
 }
 
 type UpdateCheck struct {
-	CheckId     string
+	Id          string
 	UserId      int
 	Name        string
 	Description string
@@ -51,17 +51,17 @@ type UpdateCheck struct {
 }
 
 type DeleteCheck struct {
-	CheckId string
-	UserId  int
+	Id     string
+	UserId int
 }
 
 type SetCheckStatus struct {
-	CheckId string
-	UserId  int
-	Status  CheckStatus
+	Id     string
+	UserId int
+	Status CheckStatus
 }
 
 type AddChannels struct {
-	CheckId  string
+	Id       string
 	Channels []int
 }
