@@ -250,22 +250,27 @@ func checkDTO(check entity.Check) Check {
 		Interval:    check.Interval,
 		Grace:       check.Grace,
 		Status:      check.Status,
-		Channels:    check.Channels,
+		LastPing:    utc(check.LastPing),
+		NextPing:    utc(check.NextPing),
+		LastStarted: utc(check.LastStarted),
+		Channels:    make([]Channel, len(check.Channels)),
 	}
-	if check.LastPing != nil {
-		response.LastPing = utc(check.LastPing)
-	}
-	if check.NextPing != nil {
-		response.NextPing = utc(check.NextPing)
-	}
-	if check.LastStarted != nil {
-		response.LastStarted = utc(check.LastStarted)
+	for i, channel := range check.Channels {
+		response.Channels[i] = Channel{
+			Id:         channel.Id,
+			Kind:       channel.Kind,
+			Email:      channel.Email,
+			WebhookURL: channel.WebhookURL,
+		}
 	}
 
 	return response
 }
 
 func utc(time *time.Time) *time.Time {
+	if time == nil {
+		return nil
+	}
 	val := time.UTC()
 	return &val
 }

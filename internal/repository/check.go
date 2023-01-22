@@ -44,7 +44,12 @@ func (r *checkRepository) GetMany(ctx context.Context, userId int) ([]entity.Che
        next_ping,
        last_started,
        status,
-       array(SELECT channels.id
+       (SELECT json_agg(json_build_object(
+           'id', id,
+           'kind', kind,
+           'email', email,
+           'webhook_url', webhook_url
+       )) channels
         FROM checks_channels
         INNER JOIN channels on checks_channels.channel_id = channels.id
         WHERE checks_channels.check_id = checks.id) channels
@@ -72,7 +77,12 @@ func (r *checkRepository) Get(ctx context.Context, params entity.GetCheck) (enti
        next_ping,
        last_started,
        status,
-       array(SELECT channels.id
+       (SELECT json_agg(json_build_object(
+           'id', id,
+           'kind', kind,
+           'email', email,
+           'webhook_url', webhook_url
+       ))
         FROM checks_channels
         INNER JOIN channels on checks_channels.channel_id = channels.id
         WHERE checks_channels.check_id = checks.id) channels

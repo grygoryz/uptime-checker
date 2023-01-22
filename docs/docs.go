@@ -641,6 +641,27 @@ const docTemplate = `{
                 }
             }
         },
+        "check.Channel": {
+            "type": "object",
+            "required": [
+                "id",
+                "kind"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "kind": {
+                    "$ref": "#/definitions/entity.ChannelKind"
+                },
+                "webhookURL": {
+                    "type": "string"
+                }
+            }
+        },
         "check.Check": {
             "type": "object",
             "required": [
@@ -656,7 +677,7 @@ const docTemplate = `{
                 "channels": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "$ref": "#/definitions/check.Channel"
                     }
                 },
                 "description": {

@@ -1,6 +1,9 @@
 package entity
 
-import "database/sql"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type ChannelKind string
 
@@ -18,10 +21,24 @@ type Channel struct {
 }
 
 type ChannelShort struct {
-	Id         int            `db:"id"`
-	Kind       ChannelKind    `db:"kind"`
-	Email      sql.NullString `db:"email"`
-	WebhookURL sql.NullString `db:"webhook_url"`
+	Id         int         `db:"id"`
+	Kind       ChannelKind `db:"kind"`
+	Email      *string     `db:"email"`
+	WebhookURL *string     `db:"webhook_url"`
+}
+
+type Channels []ChannelShort
+
+// Scan converts the data returned from the DB into the struct.
+func (c *Channels) Scan(v interface{}) error {
+	switch vv := v.(type) {
+	case []byte:
+		return json.Unmarshal(vv, c)
+	case string:
+		return json.Unmarshal([]byte(vv), c)
+	default:
+		return fmt.Errorf("unsupported type: %T", v)
+	}
 }
 
 type CreateChannel struct {

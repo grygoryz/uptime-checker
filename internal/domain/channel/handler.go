@@ -121,8 +121,8 @@ func (h handler) GetChannels(w http.ResponseWriter, r *http.Request) {
 		response[i] = GetChannelsResponseItem{
 			Id:         channel.Id,
 			Kind:       channel.Kind,
-			Email:      channel.Email.String,
-			WebhookURL: channel.WebhookURL.String,
+			Email:      channel.Email,
+			WebhookURL: channel.WebhookURL,
 		}
 	}
 	respond.JSON(r.Context(), w, http.StatusOK, response)

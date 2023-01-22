@@ -21,6 +21,6 @@ type UpdateChannelBody struct {
 type GetChannelsResponseItem struct {
 	Id         int                `json:"id" validate:"required"`
 	Kind       entity.ChannelKind `json:"kind" validate:"required"`
-	Email      string             `json:"email,omitempty"`
-	WebhookURL string             `json:"webhookURL,omitempty"`
+	Email      *string            `json:"email,omitempty"`
+	WebhookURL *string            `json:"webhookURL,omitempty"`
 }

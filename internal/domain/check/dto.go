@@ -15,7 +15,14 @@ type Check struct {
 	NextPing    *time.Time         `json:"nextPing,omitempty"`
 	LastStarted *time.Time         `json:"lastStarted,omitempty"`
 	Status      entity.CheckStatus `json:"status" validate:"required"`
-	Channels    []int64            `json:"channels" validate:"required"`
+	Channels    []Channel          `json:"channels" validate:"required"`
+}
+
+type Channel struct {
+	Id         int                `json:"id" validate:"required"`
+	Kind       entity.ChannelKind `json:"kind" validate:"required"`
+	Email      *string            `json:"email,omitempty"`
+	WebhookURL *string            `json:"webhookURL,omitempty"`
 }
 
 type CheckIdParam struct {

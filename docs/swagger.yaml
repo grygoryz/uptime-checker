@@ -86,11 +86,25 @@ definitions:
     required:
     - kind
     type: object
+  check.Channel:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      kind:
+        $ref: '#/definitions/entity.ChannelKind'
+      webhookURL:
+        type: string
+    required:
+    - id
+    - kind
+    type: object
   check.Check:
     properties:
       channels:
         items:
-          type: integer
+          $ref: '#/definitions/check.Channel'
         type: array
       description:
         type: string

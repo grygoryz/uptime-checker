@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"github.com/lib/pq"
 	"time"
 )
 
@@ -16,16 +15,16 @@ const (
 )
 
 type Check struct {
-	Id          string        `db:"id"`
-	Name        string        `db:"name"`
-	Description string        `db:"description"`
-	Interval    int           `db:"interval"`
-	Grace       int           `db:"grace"`
-	LastPing    *time.Time    `db:"last_ping"`
-	NextPing    *time.Time    `db:"next_ping"`
-	LastStarted *time.Time    `db:"last_started"`
-	Status      CheckStatus   `db:"status"`
-	Channels    pq.Int64Array `db:"channels"`
+	Id          string      `db:"id"`
+	Name        string      `db:"name"`
+	Description string      `db:"description"`
+	Interval    int         `db:"interval"`
+	Grace       int         `db:"grace"`
+	LastPing    *time.Time  `db:"last_ping"`
+	NextPing    *time.Time  `db:"next_ping"`
+	LastStarted *time.Time  `db:"last_started"`
+	Status      CheckStatus `db:"status"`
+	Channels    Channels    `db:"channels"`
 }
 
 type GetCheck struct {
