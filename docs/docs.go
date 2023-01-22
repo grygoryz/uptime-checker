@@ -266,6 +266,245 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/v1/checks": {
+            "get": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checks"
+                ],
+                "summary": "Get checks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/check.Check"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checks"
+                ],
+                "summary": "Create check",
+                "parameters": [
+                    {
+                        "description": "check data",
+                        "name": "check",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/check.CreateCheckBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/check.CreateCheckResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/checks/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checks"
+                ],
+                "summary": "Get check",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "check id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/check.Check"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checks"
+                ],
+                "summary": "Update check",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "check id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "check data",
+                        "name": "check",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/check.CreateCheckBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checks"
+                ],
+                "summary": "Delete check",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "check id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/checks/{id}/pause": {
+            "put": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checks"
+                ],
+                "summary": "Pause check",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "check id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/checks/{id}/resume": {
+            "put": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checks"
+                ],
+                "summary": "Pause check",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "check id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -402,6 +641,103 @@ const docTemplate = `{
                 }
             }
         },
+        "check.Check": {
+            "type": "object",
+            "required": [
+                "channels",
+                "description",
+                "grace",
+                "id",
+                "interval",
+                "name",
+                "status"
+            ],
+            "properties": {
+                "channels": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "grace": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "interval": {
+                    "type": "integer"
+                },
+                "lastPing": {
+                    "type": "string"
+                },
+                "lastStarted": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nextPing": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/entity.CheckStatus"
+                }
+            }
+        },
+        "check.CreateCheckBody": {
+            "type": "object",
+            "required": [
+                "channels",
+                "description",
+                "grace",
+                "interval",
+                "name"
+            ],
+            "properties": {
+                "channels": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 528
+                },
+                "grace": {
+                    "description": "min 1 minute, max 1 year",
+                    "type": "integer",
+                    "maximum": 31536000,
+                    "minimum": 60
+                },
+                "interval": {
+                    "description": "min 1 minute, max 1 year",
+                    "type": "integer",
+                    "maximum": 31536000,
+                    "minimum": 60
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 128
+                }
+            }
+        },
+        "check.CreateCheckResponse": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.ChannelKind": {
             "type": "string",
             "enum": [
@@ -411,6 +747,23 @@ const docTemplate = `{
             "x-enum-varnames": [
                 "EmailChannel",
                 "WebhookChannel"
+            ]
+        },
+        "entity.CheckStatus": {
+            "type": "string",
+            "enum": [
+                "new",
+                "started",
+                "up",
+                "down",
+                "paused"
+            ],
+            "x-enum-varnames": [
+                "CheckNew",
+                "CheckStarted",
+                "CheckUp",
+                "CheckDown",
+                "CheckPaused"
             ]
         }
     },

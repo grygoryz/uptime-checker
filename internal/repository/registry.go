@@ -9,6 +9,7 @@ type Registry struct {
 	db      *sqlx.DB
 	User    User
 	Channel Channel
+	Check   Check
 }
 
 func NewRegistry(db *sqlx.DB) *Registry {
@@ -16,6 +17,7 @@ func NewRegistry(db *sqlx.DB) *Registry {
 		db:      db,
 		User:    NewUser(db),
 		Channel: NewChannel(db),
+		Check:   NewCheck(db),
 	}
 }
 
@@ -26,7 +28,7 @@ type txKey struct{}
 // WithTx wraps function in transaction by providing *sqlx.Tx into the context. Transactions work only for
 // repositories of the Registry
 func (r *Registry) WithTx(ctx context.Context, fn txFn) (interface{}, error) {
-	tx, err := r.db.Begin()
+	tx, err := r.db.Beginx()
 	if err != nil {
 		return nil, err
 	}

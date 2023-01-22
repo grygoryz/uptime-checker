@@ -86,6 +86,76 @@ definitions:
     required:
     - kind
     type: object
+  check.Check:
+    properties:
+      channels:
+        items:
+          type: integer
+        type: array
+      description:
+        type: string
+      grace:
+        type: integer
+      id:
+        type: string
+      interval:
+        type: integer
+      lastPing:
+        type: string
+      lastStarted:
+        type: string
+      name:
+        type: string
+      nextPing:
+        type: string
+      status:
+        $ref: '#/definitions/entity.CheckStatus'
+    required:
+    - channels
+    - description
+    - grace
+    - id
+    - interval
+    - name
+    - status
+    type: object
+  check.CreateCheckBody:
+    properties:
+      channels:
+        items:
+          type: integer
+        minItems: 1
+        type: array
+      description:
+        maxLength: 528
+        type: string
+      grace:
+        description: min 1 minute, max 1 year
+        maximum: 31536000
+        minimum: 60
+        type: integer
+      interval:
+        description: min 1 minute, max 1 year
+        maximum: 31536000
+        minimum: 60
+        type: integer
+      name:
+        maxLength: 128
+        type: string
+    required:
+    - channels
+    - description
+    - grace
+    - interval
+    - name
+    type: object
+  check.CreateCheckResponse:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
   entity.ChannelKind:
     enum:
     - email
@@ -94,6 +164,20 @@ definitions:
     x-enum-varnames:
     - EmailChannel
     - WebhookChannel
+  entity.CheckStatus:
+    enum:
+    - new
+    - started
+    - up
+    - down
+    - paused
+    type: string
+    x-enum-varnames:
+    - CheckNew
+    - CheckStarted
+    - CheckUp
+    - CheckDown
+    - CheckPaused
 info:
   contact: {}
   title: Uptime Checker
@@ -253,6 +337,152 @@ paths:
       summary: Update channel
       tags:
       - Channels
+  /v1/checks:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/check.Check'
+            type: array
+      security:
+      - cookieAuth: []
+      summary: Get checks
+      tags:
+      - Checks
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: check data
+        in: body
+        name: check
+        required: true
+        schema:
+          $ref: '#/definitions/check.CreateCheckBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/check.CreateCheckResponse'
+      security:
+      - cookieAuth: []
+      summary: Create check
+      tags:
+      - Checks
+  /v1/checks/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - cookieAuth: []
+      summary: Delete check
+      tags:
+      - Checks
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/check.Check'
+      security:
+      - cookieAuth: []
+      summary: Get check
+      tags:
+      - Checks
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: check data
+        in: body
+        name: check
+        required: true
+        schema:
+          $ref: '#/definitions/check.CreateCheckBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - cookieAuth: []
+      summary: Update check
+      tags:
+      - Checks
+  /v1/checks/{id}/pause:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - cookieAuth: []
+      summary: Pause check
+      tags:
+      - Checks
+  /v1/checks/{id}/resume:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - cookieAuth: []
+      summary: Pause check
+      tags:
+      - Checks
 securityDefinitions:
   cookieAuth:
     in: cookie
