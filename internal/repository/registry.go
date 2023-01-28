@@ -10,6 +10,7 @@ type Registry struct {
 	User    User
 	Channel Channel
 	Check   Check
+	Ping    Ping
 }
 
 func NewRegistry(db *sqlx.DB) *Registry {
@@ -18,6 +19,7 @@ func NewRegistry(db *sqlx.DB) *Registry {
 		User:    NewUser(db),
 		Channel: NewChannel(db),
 		Check:   NewCheck(db),
+		Ping:    NewPing(db),
 	}
 }
 

@@ -1,0 +1,61 @@
+package ping
+
+import (
+	"context"
+	"gitlab.com/grygoryz/uptime-checker/internal/entity"
+	"gitlab.com/grygoryz/uptime-checker/internal/repository"
+	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
+	"math"
+)
+
+type Service interface {
+	CreatePing(ctx context.Context, ping entity.CreatePing) error
+}
+
+type service struct {
+	r *repository.Registry
+}
+
+func NewService(repositoryRegistry *repository.Registry) Service {
+	return &service{r: repositoryRegistry}
+}
+
+func (s *service) CreatePing(ctx context.Context, ping entity.CreatePing) error {
+	_, err := s.r.WithTx(ctx, func(ctx context.Context) (interface{}, error) {
+		var err error
+		switch ping.Type {
+		case entity.PingSuccess:
+			err = s.r.Check.PingSuccess(ctx, ping.CheckId, ping.Date)
+		case entity.PingStart:
+			err = s.r.Check.PingStart(ctx, ping.CheckId, ping.Date)
+		case entity.PingFail:
+			err = s.r.Check.PingFail(ctx, ping.CheckId, ping.Date)
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		if ping.Type != entity.PingStart {
+			lastPing, err := s.r.Ping.GetLastTypeAndDate(ctx, ping.CheckId)
+			if err != nil {
+				appErr, ok := err.(errors.AppError)
+				if !ok || appErr.Kind != errors.NotExist {
+					return nil, err
+				}
+			}
+			if lastPing != nil && lastPing.Type == entity.PingStart {
+				ping.Duration.Int32 = int32(math.Round(ping.Date.Sub(lastPing.Date).Seconds()))
+				ping.Duration.Valid = true
+			}
+		}
+
+		err = s.r.Ping.Create(ctx, ping)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, nil
+	})
+
+	return err
+}

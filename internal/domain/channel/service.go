@@ -16,12 +16,11 @@ type Service interface {
 }
 
 type service struct {
-	r       *repository.Registry
-	session *repository.Session
+	r *repository.Registry
 }
 
-func NewService(repositoryRegistry *repository.Registry, session *repository.Session) Service {
-	return &service{r: repositoryRegistry, session: session}
+func NewService(repositoryRegistry *repository.Registry) Service {
+	return &service{r: repositoryRegistry}
 }
 
 func (s *service) CreateChannel(ctx context.Context, channel entity.CreateChannel) (int, error) {

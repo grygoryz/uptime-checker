@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
+	"time"
 )
 
 type Check interface {
@@ -20,6 +21,9 @@ type Check interface {
 	SetStatus(ctx context.Context, check entity.SetCheckStatus) error
 	AddChannels(ctx context.Context, params entity.AddChannels) error
 	DeleteChannels(ctx context.Context, checkId string) error
+	PingSuccess(ctx context.Context, checkId string, t time.Time) error
+	PingStart(ctx context.Context, checkId string, t time.Time) error
+	PingFail(ctx context.Context, checkId string, t time.Time) error
 }
 
 type checkRepository struct {
@@ -233,6 +237,81 @@ func (r *checkRepository) DeleteChannels(ctx context.Context, checkId string) er
 	}
 	if affected != 1 {
 		return errors.E(errors.NotExist, "check not found")
+	}
+
+	return nil
+}
+
+// PingSuccess applies success ping to check
+func (r *checkRepository) PingSuccess(ctx context.Context, checkId string, t time.Time) error {
+	q := getQueryable(ctx, r.db)
+
+	query := `UPDATE checks
+	SET last_ping    = $1,
+    	next_ping    = $1::timestamptz + (concat(interval, 's'))::interval,
+    	last_started = NULL,
+    	status       = 'up'
+	WHERE id = $2 AND status != 'paused'`
+	result, err := q.ExecContext(ctx, query, t, checkId)
+	if err != nil {
+		return err
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected != 1 {
+		return errors.E(errors.NotExist, "check not found or it's paused")
+	}
+
+	return nil
+}
+
+// PingStart applies start ping to check
+func (r *checkRepository) PingStart(ctx context.Context, checkId string, t time.Time) error {
+	q := getQueryable(ctx, r.db)
+
+	query := `UPDATE checks
+	SET last_started = $1,
+    	status       = 'started'
+	WHERE id = $2 AND status != 'paused'`
+	result, err := q.ExecContext(ctx, query, t, checkId)
+	if err != nil {
+		return err
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected != 1 {
+		return errors.E(errors.NotExist, "check not found or it's paused")
+	}
+
+	return nil
+}
+
+// PingFail applies fail ping to check
+func (r *checkRepository) PingFail(ctx context.Context, checkId string, t time.Time) error {
+	q := getQueryable(ctx, r.db)
+
+	query := `UPDATE checks
+	SET last_ping    = $1,
+    	last_started = NULL,
+    	status       = 'down'
+	WHERE id = $2 AND status != 'paused'`
+	result, err := q.ExecContext(ctx, query, t, checkId)
+	if err != nil {
+		return err
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected != 1 {
+		return errors.E(errors.NotExist, "check not found or it's paused")
 	}
 
 	return nil

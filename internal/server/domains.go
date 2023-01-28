@@ -5,6 +5,7 @@ import (
 	"gitlab.com/grygoryz/uptime-checker/internal/domain/auth"
 	"gitlab.com/grygoryz/uptime-checker/internal/domain/channel"
 	"gitlab.com/grygoryz/uptime-checker/internal/domain/check"
+	"gitlab.com/grygoryz/uptime-checker/internal/domain/ping"
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
 )
 
@@ -15,6 +16,7 @@ func (s *Server) initDomains() {
 	s.initAuth(registry, session)
 	s.initChannel(registry, session)
 	s.initCheck(registry, session)
+	s.initPing(registry)
 	s.initSwagger()
 }
 
@@ -24,13 +26,18 @@ func (s *Server) initAuth(registry *repository.Registry, session *repository.Ses
 }
 
 func (s *Server) initChannel(registry *repository.Registry, session *repository.Session) {
-	service := channel.NewService(registry, session)
+	service := channel.NewService(registry)
 	channel.RegisterHandler(s.router, service, s.validator, session)
 }
 
 func (s *Server) initCheck(registry *repository.Registry, session *repository.Session) {
-	service := check.NewService(registry, session)
+	service := check.NewService(registry)
 	check.RegisterHandler(s.router, service, s.validator, session)
+}
+
+func (s *Server) initPing(registry *repository.Registry) {
+	service := ping.NewService(registry)
+	ping.RegisterHandler(s.router, service, s.validator)
 }
 
 func (s *Server) initSwagger() {

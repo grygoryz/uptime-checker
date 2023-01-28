@@ -497,6 +497,75 @@ paths:
       summary: Pause check
       tags:
       - Checks
+  /v1/pings/{checkId}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        schema:
+          type: string
+      - description: check id
+        in: path
+        name: checkId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Create success ping
+      tags:
+      - Pings
+  /v1/pings/{checkId}/fail:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        schema:
+          type: string
+      - description: check id
+        in: path
+        name: checkId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Create fail ping
+      tags:
+      - Pings
+  /v1/pings/{checkId}/start:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        schema:
+          type: string
+      - description: check id
+        in: path
+        name: checkId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Create start ping
+      tags:
+      - Pings
 securityDefinitions:
   cookieAuth:
     in: cookie
