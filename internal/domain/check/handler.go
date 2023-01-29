@@ -30,7 +30,6 @@ func RegisterHandler(router *chi.Mux, service Service, validator *validate.Valid
 		router.Put("/{id}", h.UpdateCheck)
 		router.Delete("/{id}", h.DeleteCheck)
 		router.Put("/{id}/pause", h.PauseCheck)
-		router.Put("/{id}/resume", h.ResumeCheck)
 		router.Get("/{id}/pings", h.GetPings)
 		router.Get("/{id}/flips", h.GetFlips)
 	})
@@ -208,33 +207,6 @@ func (h handler) PauseCheck(w http.ResponseWriter, r *http.Request) {
 
 	user := middleware.User(r.Context())
 	err = h.service.PauseCheck(r.Context(), checkId, user.Id)
-	if err != nil {
-		respond.Error(r.Context(), w, err)
-		return
-	}
-
-	respond.Status(w, http.StatusOK)
-}
-
-// ResumeCheck resumes check
-// @Tags Checks
-// @Summary Pause check
-// @Security cookieAuth
-// @Accept json
-// @Produce json
-// @Param id path string true "check id"
-// @Success 200
-// @router /v1/checks/{id}/resume [put]
-func (h handler) ResumeCheck(w http.ResponseWriter, r *http.Request) {
-	checkId := chi.URLParam(r, "id")
-	err := h.validator.Struct(CheckIdParam{Id: checkId})
-	if err != nil {
-		respond.Error(r.Context(), w, err)
-		return
-	}
-
-	user := middleware.User(r.Context())
-	err = h.service.ResumeCheck(r.Context(), checkId, user.Id)
 	if err != nil {
 		respond.Error(r.Context(), w, err)
 		return

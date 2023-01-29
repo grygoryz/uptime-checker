@@ -634,26 +634,6 @@ paths:
       summary: Get pings
       tags:
       - Checks
-  /v1/checks/{id}/resume:
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: check id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-      security:
-      - cookieAuth: []
-      summary: Pause check
-      tags:
-      - Checks
   /v1/pings/{checkId}:
     put:
       consumes:

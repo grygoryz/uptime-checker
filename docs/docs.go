@@ -597,39 +597,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/checks/{id}/resume": {
-            "put": {
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Checks"
-                ],
-                "summary": "Pause check",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "check id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
         "/v1/pings/{checkId}": {
             "put": {
                 "consumes": [

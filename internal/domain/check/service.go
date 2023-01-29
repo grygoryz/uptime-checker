@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
+	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
 	"time"
 )
 
@@ -15,7 +16,6 @@ type Service interface {
 	UpdateCheck(ctx context.Context, check entity.UpdateCheck, channels []int) error
 	DeleteCheck(ctx context.Context, check entity.DeleteCheck) error
 	PauseCheck(ctx context.Context, checkId string, userId int) error
-	ResumeCheck(ctx context.Context, checkId string, userId int) error
 	GetPings(ctx context.Context, params entity.GetPings) ([]entity.Ping, int, error)
 	GetFlips(ctx context.Context, params entity.GetFlips) ([]entity.Flip, int, error)
 }
@@ -83,7 +83,12 @@ func (s *service) DeleteCheck(ctx context.Context, check entity.DeleteCheck) err
 
 func (s *service) PauseCheck(ctx context.Context, checkId string, userId int) error {
 	_, err := s.r.WithTx(ctx, func(ctx context.Context) (interface{}, error) {
-		err := s.r.Check.SetStatus(ctx, entity.SetCheckStatus{
+		status, err := s.r.Check.GetStatus(ctx, checkId)
+		if status == entity.CheckPaused {
+			return nil, errors.E(errors.Validation, "check is paused already")
+		}
+
+		err = s.r.Check.SetStatus(ctx, entity.SetCheckStatus{
 			Id:     checkId,
 			UserId: userId,
 			Status: entity.CheckPaused,
@@ -105,14 +110,6 @@ func (s *service) PauseCheck(ctx context.Context, checkId string, userId int) er
 	})
 
 	return err
-}
-
-func (s *service) ResumeCheck(ctx context.Context, checkId string, userId int) error {
-	return s.r.Check.SetStatus(ctx, entity.SetCheckStatus{
-		Id:     checkId,
-		UserId: userId,
-		Status: entity.CheckNew,
-	})
 }
 
 type pingsTxResult struct {

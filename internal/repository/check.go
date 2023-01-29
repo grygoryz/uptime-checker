@@ -269,7 +269,7 @@ func (r *checkRepository) PingSuccess(ctx context.Context, checkId string, t tim
     	next_ping    = $1::timestamptz + (concat(interval, 's'))::interval,
     	last_started = NULL,
     	status       = 'up'
-	WHERE id = $2 AND status != 'paused'`
+	WHERE id = $2`
 	result, err := q.ExecContext(ctx, query, t, checkId)
 	if err != nil {
 		return err
@@ -293,7 +293,7 @@ func (r *checkRepository) PingStart(ctx context.Context, checkId string, t time.
 	query := `UPDATE checks
 	SET last_started = $1,
     	status       = 'started'
-	WHERE id = $2 AND status != 'paused'`
+	WHERE id = $2`
 	result, err := q.ExecContext(ctx, query, t, checkId)
 	if err != nil {
 		return err
@@ -318,7 +318,7 @@ func (r *checkRepository) PingFail(ctx context.Context, checkId string, t time.T
 	SET last_ping    = $1,
     	last_started = NULL,
     	status       = 'down'
-	WHERE id = $2 AND status != 'paused'`
+	WHERE id = $2`
 	result, err := q.ExecContext(ctx, query, t, checkId)
 	if err != nil {
 		return err
