@@ -11,6 +11,8 @@ import (
 type Ping interface {
 	Create(ctx context.Context, ping entity.CreatePing) error
 	GetLastTypeAndDate(ctx context.Context, checkId string) (*entity.PingTypeAndDate, error)
+	GetTotal(ctx context.Context, params entity.GetPingsTotal) (int, error)
+	GetMany(ctx context.Context, params entity.GetPings) ([]entity.Ping, error)
 }
 
 type pingRepository struct {
@@ -66,4 +68,38 @@ func (r *pingRepository) GetLastTypeAndDate(ctx context.Context, checkId string)
 	}
 
 	return &ping, nil
+}
+
+// GetTotal returns check's pings total number for specified period
+func (r *pingRepository) GetTotal(ctx context.Context, params entity.GetPingsTotal) (int, error) {
+	q := getQueryable(ctx, r.db)
+	var total int
+
+	query := `SELECT count(*)
+    FROM pings
+	WHERE check_id = $1 AND date >= $2 AND date <= $3`
+	err := q.GetContext(ctx, &total, query, params.CheckId, params.From, params.To)
+	if err != nil {
+		return 0, err
+	}
+
+	return total, nil
+}
+
+// GetMany returns check's pings
+func (r *pingRepository) GetMany(ctx context.Context, params entity.GetPings) ([]entity.Ping, error) {
+	q := getQueryable(ctx, r.db)
+	var pings []entity.Ping
+
+	query := `SELECT id, "type", "date", source, user_agent, duration, body
+    FROM pings
+	WHERE check_id = $1 AND date >= $2 AND date <= $3
+	ORDER BY date DESC
+	LIMIT $4 OFFSET $5`
+	err := q.SelectContext(ctx, &pings, query, params.CheckId, params.From, params.To, params.Limit, params.Offset)
+	if err != nil {
+		return nil, err
+	}
+
+	return pings, nil
 }

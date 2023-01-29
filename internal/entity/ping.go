@@ -24,6 +24,30 @@ type CreatePing struct {
 }
 
 type PingTypeAndDate struct {
-	Type PingKind
-	Date time.Time
+	Type PingKind  `db:"type"`
+	Date time.Time `db:"date"`
+}
+
+type GetPingsTotal struct {
+	CheckId string
+	From    time.Time
+	To      time.Time
+}
+
+type GetPings struct {
+	CheckId string
+	From    time.Time
+	To      time.Time
+	Limit   int
+	Offset  int
+}
+
+type Ping struct {
+	Id        int       `db:"id"`
+	Type      PingKind  `db:"type"`
+	Source    string    `db:"source"`
+	UserAgent string    `db:"user_agent"`
+	Body      string    `db:"body"`
+	Date      time.Time `db:"date"`
+	Duration  *int      `db:"duration"`
 }

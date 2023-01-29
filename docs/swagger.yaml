@@ -170,6 +170,63 @@ definitions:
     required:
     - id
     type: object
+  check.Flip:
+    properties:
+      date:
+        type: string
+      to:
+        $ref: '#/definitions/entity.FlipState'
+    required:
+    - date
+    - to
+    type: object
+  check.GetFlipsResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/check.Flip'
+        type: array
+      total:
+        type: integer
+    required:
+    - items
+    - total
+    type: object
+  check.GetPingsResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/check.Ping'
+        type: array
+      total:
+        type: integer
+    required:
+    - items
+    - total
+    type: object
+  check.Ping:
+    properties:
+      body:
+        type: string
+      date:
+        type: string
+      duration:
+        type: integer
+      id:
+        type: integer
+      source:
+        type: string
+      type:
+        $ref: '#/definitions/entity.PingKind'
+      userAgent:
+        type: string
+    required:
+    - date
+    - id
+    - source
+    - type
+    - userAgent
+    type: object
   entity.ChannelKind:
     enum:
     - email
@@ -192,6 +249,26 @@ definitions:
     - CheckUp
     - CheckDown
     - CheckPaused
+  entity.FlipState:
+    enum:
+    - up
+    - down
+    - paused
+    type: string
+    x-enum-varnames:
+    - FlipUp
+    - FlipDown
+    - FlipPaused
+  entity.PingKind:
+    enum:
+    - start
+    - success
+    - fail
+    type: string
+    x-enum-varnames:
+    - PingStart
+    - PingSuccess
+    - PingFail
 info:
   contact: {}
   title: Uptime Checker
@@ -457,6 +534,46 @@ paths:
       summary: Update check
       tags:
       - Checks
+  /v1/checks/{id}/flips:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      - in: query
+        name: from
+        required: true
+        type: integer
+      - in: query
+        maximum: 50
+        minimum: 1
+        name: limit
+        required: true
+        type: integer
+      - in: query
+        name: offset
+        required: true
+        type: integer
+      - in: query
+        name: to
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/check.GetFlipsResponse'
+      security:
+      - cookieAuth: []
+      summary: Get flips
+      tags:
+      - Checks
   /v1/checks/{id}/pause:
     put:
       consumes:
@@ -475,6 +592,46 @@ paths:
       security:
       - cookieAuth: []
       summary: Pause check
+      tags:
+      - Checks
+  /v1/checks/{id}/pings:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      - in: query
+        name: from
+        required: true
+        type: integer
+      - in: query
+        maximum: 50
+        minimum: 1
+        name: limit
+        required: true
+        type: integer
+      - in: query
+        name: offset
+        required: true
+        type: integer
+      - in: query
+        name: to
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/check.GetPingsResponse'
+      security:
+      - cookieAuth: []
+      summary: Get pings
       tags:
       - Checks
   /v1/checks/{id}/resume:

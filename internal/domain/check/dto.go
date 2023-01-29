@@ -40,3 +40,42 @@ type CreateCheckBody struct {
 type CreateCheckResponse struct {
 	Id string `json:"id" validate:"required"`
 }
+
+type GetPingsQuery struct {
+	From   int  `json:"from" validate:"required"`
+	To     int  `json:"to" validate:"required"`
+	Limit  int  `json:"limit" validate:"required,min=1,max=50"`
+	Offset *int `json:"offset" validate:"required"`
+}
+
+type Ping struct {
+	Id        int             `json:"id" validate:"required"`
+	Type      entity.PingKind `json:"type" validate:"required"`
+	Source    string          `json:"source" validate:"required"`
+	UserAgent string          `json:"userAgent" validate:"required"`
+	Body      string          `json:"body,omitempty"`
+	Date      time.Time       `json:"date" validate:"required"`
+	Duration  *int            `json:"duration,omitempty"`
+}
+
+type GetPingsResponse struct {
+	Total int    `json:"total" validate:"required"`
+	Items []Ping `json:"items" validate:"required"`
+}
+
+type GetFlipsQuery struct {
+	From   int  `json:"from" validate:"required"`
+	To     int  `json:"to" validate:"required"`
+	Limit  int  `json:"limit" validate:"required,min=1,max=50"`
+	Offset *int `json:"offset" validate:"required"`
+}
+
+type Flip struct {
+	To   entity.FlipState `json:"to" validate:"required"`
+	Date time.Time        `json:"date" validate:"required"`
+}
+
+type GetFlipsResponse struct {
+	Total int    `json:"total" validate:"required"`
+	Items []Flip `json:"items" validate:"required"`
+}

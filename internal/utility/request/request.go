@@ -33,3 +33,12 @@ func IntParam(r *http.Request, param string) (int, error) {
 
 	return value, err
 }
+
+func IntQueryParam(r *http.Request, param string) (int, error) {
+	value, err := strconv.Atoi(r.URL.Query().Get(param))
+	if err != nil {
+		return 0, errors.E(errors.Validation, fmt.Sprintf("param %q must be an int", param))
+	}
+
+	return value, err
+}

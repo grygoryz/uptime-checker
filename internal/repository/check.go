@@ -15,6 +15,7 @@ import (
 type Check interface {
 	GetMany(ctx context.Context, userId int) ([]entity.Check, error)
 	Get(ctx context.Context, params entity.GetCheck) (entity.Check, error)
+	GetStatus(ctx context.Context, checkId string) (entity.CheckStatus, error)
 	Create(ctx context.Context, check entity.CreateCheck) (string, error)
 	Update(ctx context.Context, check entity.UpdateCheck) error
 	Delete(ctx context.Context, check entity.DeleteCheck) error
@@ -171,6 +172,23 @@ func (r *checkRepository) Delete(ctx context.Context, check entity.DeleteCheck) 
 	}
 
 	return nil
+}
+
+// GetStatus returns check's status
+func (r *checkRepository) GetStatus(ctx context.Context, checkId string) (entity.CheckStatus, error) {
+	q := getQueryable(ctx, r.db)
+	var status entity.CheckStatus
+
+	query := `SELECT status FROM checks WHERE id = $1`
+	err := q.GetContext(ctx, &status, query, checkId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err = errors.E(errors.NotExist, "check not found")
+		}
+		return status, err
+	}
+
+	return status, nil
 }
 
 // SetStatus sets check's status

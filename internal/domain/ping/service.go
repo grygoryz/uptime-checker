@@ -22,14 +22,40 @@ func NewService(repositoryRegistry *repository.Registry) Service {
 
 func (s *service) CreatePing(ctx context.Context, ping entity.CreatePing) error {
 	_, err := s.r.WithTx(ctx, func(ctx context.Context) (interface{}, error) {
-		var err error
+		status, err := s.r.Check.GetStatus(ctx, ping.CheckId)
+		if err != nil {
+			return nil, err
+		}
+
 		switch ping.Type {
-		case entity.PingSuccess:
-			err = s.r.Check.PingSuccess(ctx, ping.CheckId, ping.Date)
 		case entity.PingStart:
 			err = s.r.Check.PingStart(ctx, ping.CheckId, ping.Date)
+		case entity.PingSuccess:
+			err = s.r.Check.PingSuccess(ctx, ping.CheckId, ping.Date)
+			if err != nil {
+				return nil, err
+			}
+
+			if status != entity.CheckUp {
+				err = s.r.Flip.Create(ctx, entity.CreateFlip{
+					To:      entity.FlipUp,
+					Date:    ping.Date,
+					CheckId: ping.CheckId,
+				})
+			}
 		case entity.PingFail:
 			err = s.r.Check.PingFail(ctx, ping.CheckId, ping.Date)
+			if err != nil {
+				return nil, err
+			}
+
+			if status != entity.CheckDown {
+				err = s.r.Flip.Create(ctx, entity.CreateFlip{
+					To:      entity.FlipDown,
+					Date:    ping.Date,
+					CheckId: ping.CheckId,
+				})
+			}
 		}
 		if err != nil {
 			return nil, err

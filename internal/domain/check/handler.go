@@ -31,6 +31,8 @@ func RegisterHandler(router *chi.Mux, service Service, validator *validate.Valid
 		router.Delete("/{id}", h.DeleteCheck)
 		router.Put("/{id}/pause", h.PauseCheck)
 		router.Put("/{id}/resume", h.ResumeCheck)
+		router.Get("/{id}/pings", h.GetPings)
+		router.Get("/{id}/flips", h.GetFlips)
 	})
 }
 
@@ -239,6 +241,163 @@ func (h handler) ResumeCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respond.Status(w, http.StatusOK)
+}
+
+// GetPings returns check's pings
+// @Tags Checks
+// @Summary Get pings
+// @Security cookieAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "check id"
+// @Param params query GetPingsQuery true "params"
+// @Success 200 {object} GetPingsResponse
+// @router /v1/checks/{id}/pings [get]
+func (h handler) GetPings(w http.ResponseWriter, r *http.Request) {
+	checkId := chi.URLParam(r, "id")
+	err := h.validator.Struct(CheckIdParam{Id: checkId})
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+
+	limit, err := request.IntQueryParam(r, "limit")
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+	offset, err := request.IntQueryParam(r, "offset")
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+	from, err := request.IntQueryParam(r, "from")
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+	to, err := request.IntQueryParam(r, "to")
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+
+	err = h.validator.Struct(GetPingsQuery{
+		From:   from,
+		To:     to,
+		Limit:  limit,
+		Offset: &offset,
+	})
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+
+	pings, total, err := h.service.GetPings(r.Context(), entity.GetPings{
+		CheckId: checkId,
+		From:    time.UnixMilli(int64(from)),
+		To:      time.UnixMilli(int64(to)),
+		Limit:   limit,
+		Offset:  offset,
+	})
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+
+	items := make([]Ping, len(pings))
+	for i, ping := range pings {
+		items[i] = Ping{
+			Id:        ping.Id,
+			Type:      ping.Type,
+			Source:    ping.Source,
+			UserAgent: ping.UserAgent,
+			Body:      ping.Body,
+			Date:      ping.Date.UTC(),
+			Duration:  ping.Duration,
+		}
+	}
+
+	respond.JSON(r.Context(), w, http.StatusOK, GetPingsResponse{
+		Total: total,
+		Items: items,
+	})
+}
+
+// GetFlips returns check's flips
+// @Tags Checks
+// @Summary Get flips
+// @Security cookieAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "check id"
+// @Param params query GetFlipsQuery true "params"
+// @Success 200 {object} GetFlipsResponse
+// @router /v1/checks/{id}/flips [get]
+func (h handler) GetFlips(w http.ResponseWriter, r *http.Request) {
+	checkId := chi.URLParam(r, "id")
+	err := h.validator.Struct(CheckIdParam{Id: checkId})
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+
+	limit, err := request.IntQueryParam(r, "limit")
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+	offset, err := request.IntQueryParam(r, "offset")
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+	from, err := request.IntQueryParam(r, "from")
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+	to, err := request.IntQueryParam(r, "to")
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+
+	err = h.validator.Struct(GetFlipsQuery{
+		From:   from,
+		To:     to,
+		Limit:  limit,
+		Offset: &offset,
+	})
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+
+	flips, total, err := h.service.GetFlips(r.Context(), entity.GetFlips{
+		CheckId: checkId,
+		From:    time.UnixMilli(int64(from)),
+		To:      time.UnixMilli(int64(to)),
+		Limit:   limit,
+		Offset:  offset,
+	})
+	if err != nil {
+		respond.Error(r.Context(), w, err)
+		return
+	}
+
+	items := make([]Flip, len(flips))
+	for i, flip := range flips {
+		items[i] = Flip{
+			To:   flip.To,
+			Date: flip.Date.UTC(),
+		}
+	}
+
+	respond.JSON(r.Context(), w, http.StatusOK, GetFlipsResponse{
+		Total: total,
+		Items: items,
+	})
 }
 
 // checkDTO transforms entity.Check to Check

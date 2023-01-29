@@ -11,6 +11,7 @@ type Registry struct {
 	Channel Channel
 	Check   Check
 	Ping    Ping
+	Flip    Flip
 }
 
 func NewRegistry(db *sqlx.DB) *Registry {
@@ -20,6 +21,7 @@ func NewRegistry(db *sqlx.DB) *Registry {
 		Channel: NewChannel(db),
 		Check:   NewCheck(db),
 		Ping:    NewPing(db),
+		Flip:    NewFlip(db),
 	}
 }
 

@@ -440,6 +440,68 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/checks/{id}/flips": {
+            "get": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checks"
+                ],
+                "summary": "Get flips",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "check id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "from",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "maximum": 50,
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "to",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/check.GetFlipsResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/checks/{id}/pause": {
             "put": {
                 "security": [
@@ -469,6 +531,68 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/checks/{id}/pings": {
+            "get": {
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checks"
+                ],
+                "summary": "Get pings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "check id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "from",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "maximum": 50,
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "to",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/check.GetPingsResponse"
+                        }
                     }
                 }
             }
@@ -867,6 +991,90 @@ const docTemplate = `{
                 }
             }
         },
+        "check.Flip": {
+            "type": "object",
+            "required": [
+                "date",
+                "to"
+            ],
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "to": {
+                    "$ref": "#/definitions/entity.FlipState"
+                }
+            }
+        },
+        "check.GetFlipsResponse": {
+            "type": "object",
+            "required": [
+                "items",
+                "total"
+            ],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/check.Flip"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "check.GetPingsResponse": {
+            "type": "object",
+            "required": [
+                "items",
+                "total"
+            ],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/check.Ping"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "check.Ping": {
+            "type": "object",
+            "required": [
+                "date",
+                "id",
+                "source",
+                "type",
+                "userAgent"
+            ],
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.PingKind"
+                },
+                "userAgent": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.ChannelKind": {
             "type": "string",
             "enum": [
@@ -893,6 +1101,32 @@ const docTemplate = `{
                 "CheckUp",
                 "CheckDown",
                 "CheckPaused"
+            ]
+        },
+        "entity.FlipState": {
+            "type": "string",
+            "enum": [
+                "up",
+                "down",
+                "paused"
+            ],
+            "x-enum-varnames": [
+                "FlipUp",
+                "FlipDown",
+                "FlipPaused"
+            ]
+        },
+        "entity.PingKind": {
+            "type": "string",
+            "enum": [
+                "start",
+                "success",
+                "fail"
+            ],
+            "x-enum-varnames": [
+                "PingStart",
+                "PingSuccess",
+                "PingFail"
             ]
         }
     },
