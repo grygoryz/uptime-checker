@@ -316,6 +316,7 @@ func (r *checkRepository) PingFail(ctx context.Context, checkId string, t time.T
 
 	query := `UPDATE checks
 	SET last_ping    = $1,
+	    next_ping    = NULL,
     	last_started = NULL,
     	status       = 'down'
 	WHERE id = $2`
