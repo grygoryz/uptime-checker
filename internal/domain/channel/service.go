@@ -36,23 +36,21 @@ func (s *service) GetChannels(ctx context.Context, userId int) ([]entity.Channel
 }
 
 func (s *service) DeleteChannel(ctx context.Context, channel entity.DeleteChannel) error {
-	_, err := s.r.WithTx(ctx, func(ctx context.Context) (interface{}, error) {
+	return s.r.WithTx(ctx, func(ctx context.Context) error {
 		ids, err := s.r.Channel.GetChecksDependentOnChannel(ctx, channel.Id)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		if len(ids) > 0 {
 			msg := fmt.Sprintf("there are checks that depend on this channel only: %v", ids)
-			return nil, errors.E(errors.Validation, msg)
+			return errors.E(errors.Validation, msg)
 		}
 
 		err = s.r.Channel.Delete(ctx, channel)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		return nil, nil
+		return nil
 	})
-
-	return err
 }

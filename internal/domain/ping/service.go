@@ -21,10 +21,10 @@ func NewService(repositoryRegistry *repository.Registry) Service {
 }
 
 func (s *service) CreatePing(ctx context.Context, ping entity.CreatePing) error {
-	_, err := s.r.WithTx(ctx, func(ctx context.Context) (interface{}, error) {
+	return s.r.WithTx(ctx, func(ctx context.Context) error {
 		status, err := s.r.Check.GetStatus(ctx, ping.CheckId)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		switch ping.Type {
@@ -33,7 +33,7 @@ func (s *service) CreatePing(ctx context.Context, ping entity.CreatePing) error 
 		case entity.PingSuccess:
 			err = s.r.Check.PingSuccess(ctx, ping.CheckId, ping.Date)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 			if status != entity.CheckUp {
@@ -46,7 +46,7 @@ func (s *service) CreatePing(ctx context.Context, ping entity.CreatePing) error 
 		case entity.PingFail:
 			err = s.r.Check.PingFail(ctx, ping.CheckId, ping.Date)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 			if status != entity.CheckDown {
@@ -58,7 +58,7 @@ func (s *service) CreatePing(ctx context.Context, ping entity.CreatePing) error 
 			}
 		}
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		if ping.Type != entity.PingStart {
@@ -66,7 +66,7 @@ func (s *service) CreatePing(ctx context.Context, ping entity.CreatePing) error 
 			if err != nil {
 				appErr, ok := err.(errors.AppError)
 				if !ok || appErr.Kind != errors.NotExist {
-					return nil, err
+					return err
 				}
 			}
 			if lastPing != nil && lastPing.Type == entity.PingStart {
@@ -77,11 +77,9 @@ func (s *service) CreatePing(ctx context.Context, ping entity.CreatePing) error 
 
 		err = s.r.Ping.Create(ctx, ping)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		return nil, nil
+		return nil
 	})
-
-	return err
 }

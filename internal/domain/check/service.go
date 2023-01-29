@@ -2,7 +2,6 @@ package check
 
 import (
 	"context"
-	"fmt"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
@@ -37,44 +36,44 @@ func (s *service) GetCheck(ctx context.Context, userId int, checkId string) (ent
 }
 
 func (s *service) CreateCheck(ctx context.Context, check entity.CreateCheck, channels []int) (string, error) {
-	id, err := s.r.WithTx(ctx, func(ctx context.Context) (interface{}, error) {
-		id, err := s.r.Check.Create(ctx, check)
+	var id string
+	err := s.r.WithTx(ctx, func(ctx context.Context) error {
+		var err error
+		id, err = s.r.Check.Create(ctx, check)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		err = s.r.Check.AddChannels(ctx, entity.AddChannels{Id: id, Channels: channels})
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		return id, nil
+		return nil
 	})
 
-	return fmt.Sprintf("%v", id), err
+	return id, err
 }
 
 func (s *service) UpdateCheck(ctx context.Context, check entity.UpdateCheck, channels []int) error {
-	_, err := s.r.WithTx(ctx, func(ctx context.Context) (interface{}, error) {
+	return s.r.WithTx(ctx, func(ctx context.Context) error {
 		err := s.r.Check.Update(ctx, check)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		err = s.r.Check.DeleteChannels(ctx, check.Id)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		err = s.r.Check.AddChannels(ctx, entity.AddChannels{Id: check.Id, Channels: channels})
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		return nil, nil
+		return nil
 	})
-
-	return err
 }
 
 func (s *service) DeleteCheck(ctx context.Context, check entity.DeleteCheck) error {
@@ -82,10 +81,10 @@ func (s *service) DeleteCheck(ctx context.Context, check entity.DeleteCheck) err
 }
 
 func (s *service) PauseCheck(ctx context.Context, checkId string, userId int) error {
-	_, err := s.r.WithTx(ctx, func(ctx context.Context) (interface{}, error) {
+	return s.r.WithTx(ctx, func(ctx context.Context) error {
 		status, err := s.r.Check.GetStatus(ctx, checkId)
 		if status == entity.CheckPaused {
-			return nil, errors.E(errors.Validation, "check is paused already")
+			return errors.E(errors.Validation, "check is paused already")
 		}
 
 		err = s.r.Check.SetStatus(ctx, entity.SetCheckStatus{
@@ -94,7 +93,7 @@ func (s *service) PauseCheck(ctx context.Context, checkId string, userId int) er
 			Status: entity.CheckPaused,
 		})
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		err = s.r.Flip.Create(ctx, entity.CreateFlip{
@@ -103,73 +102,65 @@ func (s *service) PauseCheck(ctx context.Context, checkId string, userId int) er
 			CheckId: checkId,
 		})
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		return nil, nil
+		return nil
 	})
-
-	return err
-}
-
-type pingsTxResult struct {
-	Pings []entity.Ping
-	Total int
 }
 
 func (s *service) GetPings(ctx context.Context, params entity.GetPings) ([]entity.Ping, int, error) {
-	result, err := s.r.WithTx(ctx, func(ctx context.Context) (interface{}, error) {
-		total, err := s.r.Ping.GetTotal(ctx, entity.GetPingsTotal{
+	var pings []entity.Ping
+	var total int
+	err := s.r.WithTx(ctx, func(ctx context.Context) error {
+		var err error
+		total, err = s.r.Ping.GetTotal(ctx, entity.GetPingsTotal{
 			CheckId: params.CheckId,
 			From:    params.From,
 			To:      params.To,
 		})
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		pings, err := s.r.Ping.GetMany(ctx, params)
+		pings, err = s.r.Ping.GetMany(ctx, params)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		return pingsTxResult{Pings: pings, Total: total}, nil
+		return nil
 	})
 	if err != nil {
 		return nil, 0, err
 	}
 
-	txResult := result.(pingsTxResult)
-	return txResult.Pings, txResult.Total, nil
-}
-
-type flipsTxResult struct {
-	Flips []entity.Flip
-	Total int
+	return pings, total, nil
 }
 
 func (s *service) GetFlips(ctx context.Context, params entity.GetFlips) ([]entity.Flip, int, error) {
-	result, err := s.r.WithTx(ctx, func(ctx context.Context) (interface{}, error) {
-		total, err := s.r.Flip.GetTotal(ctx, entity.GetFlipsTotal{
+	var flips []entity.Flip
+	var total int
+	err := s.r.WithTx(ctx, func(ctx context.Context) error {
+		var err error
+		total, err = s.r.Flip.GetTotal(ctx, entity.GetFlipsTotal{
 			CheckId: params.CheckId,
 			From:    params.From,
 			To:      params.To,
 		})
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		flips, err := s.r.Flip.GetMany(ctx, params)
+		flips, err = s.r.Flip.GetMany(ctx, params)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		return flipsTxResult{Flips: flips, Total: total}, nil
+		return nil
 	})
 	if err != nil {
 		return nil, 0, err
 	}
 
-	txResult := result.(flipsTxResult)
-	return txResult.Flips, txResult.Total, nil
+	return flips, total, nil
 }

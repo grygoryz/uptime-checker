@@ -25,16 +25,16 @@ func NewRegistry(db *sqlx.DB) *Registry {
 	}
 }
 
-type txFn func(ctx context.Context) (interface{}, error)
+type txFn func(ctx context.Context) error
 
 type txKey struct{}
 
 // WithTx wraps function in transaction by providing *sqlx.Tx into the context. Transactions work only for
 // repositories of the Registry
-func (r *Registry) WithTx(ctx context.Context, fn txFn) (interface{}, error) {
+func (r *Registry) WithTx(ctx context.Context, fn txFn) error {
 	tx, err := r.db.Beginx()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer func() {
@@ -45,22 +45,22 @@ func (r *Registry) WithTx(ctx context.Context, fn txFn) (interface{}, error) {
 	}()
 
 	txCtx := context.WithValue(ctx, txKey{}, tx)
-	res, err := fn(txCtx)
+	err = fn(txCtx)
 	if err != nil {
 		errRollback := tx.Rollback()
 		if errRollback != nil {
-			return nil, err
+			return err
 		}
 
-		return res, err
+		return err
 	}
 
 	errCommit := tx.Commit()
 	if errCommit != nil {
-		return nil, errCommit
+		return errCommit
 	}
 
-	return res, err
+	return err
 }
 
 // getQueryable returns *sql.Tx if it exists in the context, otherwise returns *sqlx.DB

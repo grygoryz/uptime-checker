@@ -29,21 +29,19 @@ func (svc *service) SignUp(ctx context.Context, user SignUpBody) error {
 		return err
 	}
 
-	_, err = svc.r.WithTx(ctx, func(ctx context.Context) (interface{}, error) {
+	return svc.r.WithTx(ctx, func(ctx context.Context) error {
 		id, err := svc.r.User.Create(ctx, user.Email, string(password))
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		err = svc.r.Channel.CreateEmail(ctx, user.Email, id)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		return nil, err
+		return nil
 	})
-
-	return err
 }
 
 func (svc *service) SignIn(ctx context.Context, user SignInBody) (string, error) {
