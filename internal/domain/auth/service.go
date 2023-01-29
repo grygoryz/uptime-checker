@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
+	"gitlab.com/grygoryz/uptime-checker/internal/session"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -14,12 +15,12 @@ type Service interface {
 }
 
 type service struct {
-	r       *repository.Registry
-	session *repository.Session
+	r           *repository.Registry
+	sessionRepo *session.Repository
 }
 
-func NewService(repositoryRegistry *repository.Registry, session *repository.Session) Service {
-	return &service{r: repositoryRegistry, session: session}
+func NewService(repositoryRegistry *repository.Registry, sessionRepo *session.Repository) Service {
+	return &service{r: repositoryRegistry, sessionRepo: sessionRepo}
 }
 
 func (svc *service) SignUp(ctx context.Context, user SignUpBody) error {
@@ -56,7 +57,7 @@ func (svc *service) SignIn(ctx context.Context, user SignInBody) (string, error)
 		return "", errors.E(errors.Unauthorized, "credentials are not valid")
 	}
 
-	id, err := svc.session.Create(ctx, repository.UserSession{Id: dbUser.Id, Email: user.Email})
+	id, err := svc.sessionRepo.Create(ctx, session.UserData{Id: dbUser.Id, Email: user.Email})
 	if err != nil {
 		return "", err
 	}
@@ -65,5 +66,5 @@ func (svc *service) SignIn(ctx context.Context, user SignInBody) (string, error)
 }
 
 func (svc *service) SignOut(ctx context.Context, sessionId string) error {
-	return svc.session.Destroy(ctx, sessionId)
+	return svc.sessionRepo.Destroy(ctx, sessionId)
 }

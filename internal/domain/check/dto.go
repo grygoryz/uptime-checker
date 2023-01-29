@@ -37,6 +37,10 @@ type CreateCheckBody struct {
 	Channels    []int  `json:"channels" validate:"required,min=1"`
 }
 
+type UpdateCheckBody struct {
+	CreateCheckBody
+}
+
 type CreateCheckResponse struct {
 	Id string `json:"id" validate:"required"`
 }

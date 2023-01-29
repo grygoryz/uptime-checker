@@ -1,4 +1,4 @@
-package repository
+package session
 
 import (
 	"context"
@@ -9,22 +9,22 @@ import (
 	"time"
 )
 
-type Session struct {
+type Repository struct {
 	redis *redis.Client
 }
 
-func NewSession(redis *redis.Client) *Session {
-	return &Session{redis}
+func NewRepository(redis *redis.Client) *Repository {
+	return &Repository{redis}
 }
 
-type UserSession struct {
+type UserData struct {
 	Id    int    `json:"id"`
 	Email string `json:"email"`
 }
 
-const SessionTTL = time.Hour * 168
+const TTL = time.Hour * 168
 
-func (s *Session) Create(ctx context.Context, data UserSession) (string, error) {
+func (s *Repository) Create(ctx context.Context, data UserData) (string, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return "", err
@@ -36,7 +36,7 @@ func (s *Session) Create(ctx context.Context, data UserSession) (string, error) 
 	}
 
 	idStr := id.String()
-	err = s.redis.Set(ctx, sessionKey(idStr), value, SessionTTL).Err()
+	err = s.redis.Set(ctx, sessionKey(idStr), value, TTL).Err()
 	if err != nil {
 		return "", err
 	}
@@ -44,25 +44,25 @@ func (s *Session) Create(ctx context.Context, data UserSession) (string, error) 
 	return idStr, nil
 }
 
-func (s *Session) Get(ctx context.Context, id string) (UserSession, error) {
+func (s *Repository) Get(ctx context.Context, id string) (UserData, error) {
 	val, err := s.redis.Get(ctx, sessionKey(id)).Bytes()
 	if err != nil {
 		if err == redis.Nil {
 			err = errors.E(errors.NotExist, "session not found")
 		}
-		return UserSession{}, err
+		return UserData{}, err
 	}
 
-	var user UserSession
+	var user UserData
 	err = json.Unmarshal(val, &user)
 	if err != nil {
-		return UserSession{}, err
+		return UserData{}, err
 	}
 
 	return user, nil
 }
 
-func (s *Session) Destroy(ctx context.Context, id string) error {
+func (s *Repository) Destroy(ctx context.Context, id string) error {
 	return s.redis.Del(ctx, sessionKey(id)).Err()
 }
 

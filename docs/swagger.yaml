@@ -227,6 +227,36 @@ definitions:
     - type
     - userAgent
     type: object
+  check.UpdateCheckBody:
+    properties:
+      channels:
+        items:
+          type: integer
+        minItems: 1
+        type: array
+      description:
+        maxLength: 528
+        type: string
+      grace:
+        description: min 1 minute, max 1 year
+        maximum: 31536000
+        minimum: 60
+        type: integer
+      interval:
+        description: min 1 minute, max 1 year
+        maximum: 31536000
+        minimum: 60
+        type: integer
+      name:
+        maxLength: 128
+        type: string
+    required:
+    - channels
+    - description
+    - grace
+    - interval
+    - name
+    type: object
   entity.ChannelKind:
     enum:
     - email
@@ -523,7 +553,7 @@ paths:
         name: check
         required: true
         schema:
-          $ref: '#/definitions/check.CreateCheckBody'
+          $ref: '#/definitions/check.UpdateCheckBody'
       produces:
       - application/json
       responses:

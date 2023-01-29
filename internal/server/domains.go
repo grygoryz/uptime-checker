@@ -7,32 +7,33 @@ import (
 	"gitlab.com/grygoryz/uptime-checker/internal/domain/check"
 	"gitlab.com/grygoryz/uptime-checker/internal/domain/ping"
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
+	"gitlab.com/grygoryz/uptime-checker/internal/session"
 )
 
 func (s *Server) initDomains() {
-	session := repository.NewSession(s.redis)
+	sessionRepo := session.NewRepository(s.redis)
 	registry := repository.NewRegistry(s.db)
 
-	s.initAuth(registry, session)
-	s.initChannel(registry, session)
-	s.initCheck(registry, session)
+	s.initAuth(registry, sessionRepo)
+	s.initChannel(registry, sessionRepo)
+	s.initCheck(registry, sessionRepo)
 	s.initPing(registry)
 	s.initSwagger()
 }
 
-func (s *Server) initAuth(registry *repository.Registry, session *repository.Session) {
-	service := auth.NewService(registry, session)
-	auth.RegisterHandler(s.router, service, s.validator, session)
+func (s *Server) initAuth(registry *repository.Registry, sessionRepo *session.Repository) {
+	service := auth.NewService(registry, sessionRepo)
+	auth.RegisterHandler(s.router, service, s.validator, sessionRepo)
 }
 
-func (s *Server) initChannel(registry *repository.Registry, session *repository.Session) {
+func (s *Server) initChannel(registry *repository.Registry, sessionRepo *session.Repository) {
 	service := channel.NewService(registry)
-	channel.RegisterHandler(s.router, service, s.validator, session)
+	channel.RegisterHandler(s.router, service, s.validator, sessionRepo)
 }
 
-func (s *Server) initCheck(registry *repository.Registry, session *repository.Session) {
+func (s *Server) initCheck(registry *repository.Registry, sessionRepo *session.Repository) {
 	service := check.NewService(registry)
-	check.RegisterHandler(s.router, service, s.validator, session)
+	check.RegisterHandler(s.router, service, s.validator, sessionRepo)
 }
 
 func (s *Server) initPing(registry *repository.Registry) {

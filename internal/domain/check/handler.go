@@ -3,8 +3,7 @@ package check
 import (
 	"github.com/go-chi/chi/v5"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
-	"gitlab.com/grygoryz/uptime-checker/internal/middleware"
-	"gitlab.com/grygoryz/uptime-checker/internal/repository"
+	"gitlab.com/grygoryz/uptime-checker/internal/session"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/request"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/respond"
 	"gitlab.com/grygoryz/uptime-checker/internal/validate"
@@ -17,10 +16,10 @@ type handler struct {
 	validator *validate.Validator
 }
 
-func RegisterHandler(router *chi.Mux, service Service, validator *validate.Validator, session *repository.Session) {
+func RegisterHandler(router *chi.Mux, service Service, validator *validate.Validator, sessionRepo *session.Repository) {
 	h := handler{service: service, validator: validator}
 
-	authMiddleware := middleware.Auth(session)
+	authMiddleware := session.Auth(sessionRepo)
 
 	router.Route("/v1/checks", func(router chi.Router) {
 		router.Use(authMiddleware)
@@ -44,7 +43,7 @@ func RegisterHandler(router *chi.Mux, service Service, validator *validate.Valid
 // @Success 200 {array} Check
 // @router /v1/checks [get]
 func (h handler) GetChecks(w http.ResponseWriter, r *http.Request) {
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 	checks, err := h.service.GetChecks(r.Context(), user.Id)
 	if err != nil {
 		respond.Error(r.Context(), w, err)
@@ -75,7 +74,7 @@ func (h handler) GetCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 	check, err := h.service.GetCheck(r.Context(), user.Id, checkId)
 	if err != nil {
 		respond.Error(r.Context(), w, err)
@@ -101,7 +100,7 @@ func (h handler) CreateCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 	id, err := h.service.CreateCheck(r.Context(), entity.CreateCheck{
 		UserId:      user.Id,
 		Name:        body.Name,
@@ -124,7 +123,7 @@ func (h handler) CreateCheck(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param id path string true "check id"
-// @Param check body CreateCheckBody true "check data"
+// @Param check body UpdateCheckBody true "check data"
 // @Success 200
 // @router /v1/checks/{id} [put]
 func (h handler) UpdateCheck(w http.ResponseWriter, r *http.Request) {
@@ -141,7 +140,7 @@ func (h handler) UpdateCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 	err = h.service.UpdateCheck(r.Context(), entity.UpdateCheck{
 		Id:          checkId,
 		UserId:      user.Id,
@@ -175,7 +174,7 @@ func (h handler) DeleteCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 	err = h.service.DeleteCheck(r.Context(), entity.DeleteCheck{
 		Id:     checkId,
 		UserId: user.Id,
@@ -205,7 +204,7 @@ func (h handler) PauseCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 	err = h.service.PauseCheck(r.Context(), checkId, user.Id)
 	if err != nil {
 		respond.Error(r.Context(), w, err)

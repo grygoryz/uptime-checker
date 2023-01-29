@@ -398,7 +398,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/check.CreateCheckBody"
+                            "$ref": "#/definitions/check.UpdateCheckBody"
                         }
                     }
                 ],
@@ -1039,6 +1039,45 @@ const docTemplate = `{
                 },
                 "userAgent": {
                     "type": "string"
+                }
+            }
+        },
+        "check.UpdateCheckBody": {
+            "type": "object",
+            "required": [
+                "channels",
+                "description",
+                "grace",
+                "interval",
+                "name"
+            ],
+            "properties": {
+                "channels": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 528
+                },
+                "grace": {
+                    "description": "min 1 minute, max 1 year",
+                    "type": "integer",
+                    "maximum": 31536000,
+                    "minimum": 60
+                },
+                "interval": {
+                    "description": "min 1 minute, max 1 year",
+                    "type": "integer",
+                    "maximum": 31536000,
+                    "minimum": 60
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 128
                 }
             }
         },

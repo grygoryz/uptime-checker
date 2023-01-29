@@ -2,8 +2,7 @@ package auth
 
 import (
 	"github.com/go-chi/chi/v5"
-	"gitlab.com/grygoryz/uptime-checker/internal/middleware"
-	"gitlab.com/grygoryz/uptime-checker/internal/repository"
+	"gitlab.com/grygoryz/uptime-checker/internal/session"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/request"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/respond"
 	"gitlab.com/grygoryz/uptime-checker/internal/validate"
@@ -16,10 +15,10 @@ type handler struct {
 	validator *validate.Validator
 }
 
-func RegisterHandler(router *chi.Mux, service Service, validator *validate.Validator, session *repository.Session) {
+func RegisterHandler(router *chi.Mux, service Service, validator *validate.Validator, sessionRepo *session.Repository) {
 	h := handler{service: service, validator: validator}
 
-	authMiddleware := middleware.Auth(session)
+	authMiddleware := session.Auth(sessionRepo)
 
 	router.Route("/v1/auth", func(router chi.Router) {
 		router.Put("/signin", h.SignIn)
@@ -76,9 +75,9 @@ func (h handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     middleware.SessionCookieName,
+		Name:     session.CookieName,
 		Value:    id,
-		Expires:  time.Now().Add(repository.SessionTTL),
+		Expires:  time.Now().Add(session.TTL),
 		HttpOnly: true,
 		Path:     "/",
 	})
@@ -95,7 +94,7 @@ func (h handler) SignIn(w http.ResponseWriter, r *http.Request) {
 // @Success 200
 // @router /v1/auth/signout [put]
 func (h handler) SignOut(w http.ResponseWriter, r *http.Request) {
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 
 	err := h.service.SignOut(r.Context(), user.SessionId)
 	if err != nil {
@@ -105,7 +104,7 @@ func (h handler) SignOut(w http.ResponseWriter, r *http.Request) {
 
 	// delete cookie
 	http.SetCookie(w, &http.Cookie{
-		Name:     middleware.SessionCookieName,
+		Name:     session.CookieName,
 		Value:    "",
 		MaxAge:   -1,
 		HttpOnly: true,
@@ -123,6 +122,6 @@ func (h handler) SignOut(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} CheckResponse
 // @router /v1/auth/check [get]
 func (h handler) Check(w http.ResponseWriter, r *http.Request) {
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 	respond.JSON(r.Context(), w, http.StatusOK, CheckResponse{Id: user.Id, Email: user.Email})
 }

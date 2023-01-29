@@ -3,8 +3,7 @@ package channel
 import (
 	"github.com/go-chi/chi/v5"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
-	"gitlab.com/grygoryz/uptime-checker/internal/middleware"
-	"gitlab.com/grygoryz/uptime-checker/internal/repository"
+	"gitlab.com/grygoryz/uptime-checker/internal/session"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/request"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/respond"
 	"gitlab.com/grygoryz/uptime-checker/internal/validate"
@@ -16,10 +15,10 @@ type handler struct {
 	validator *validate.Validator
 }
 
-func RegisterHandler(router *chi.Mux, service Service, validator *validate.Validator, session *repository.Session) {
+func RegisterHandler(router *chi.Mux, service Service, validator *validate.Validator, sessionRepo *session.Repository) {
 	h := handler{service: service, validator: validator}
 
-	authMiddleware := middleware.Auth(session)
+	authMiddleware := session.Auth(sessionRepo)
 
 	router.Route("/v1/channels", func(router chi.Router) {
 		router.Use(authMiddleware)
@@ -46,7 +45,7 @@ func (h handler) CreateChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 	id, err := h.service.CreateChannel(r.Context(), entity.CreateChannel{
 		Kind:       body.Kind,
 		Email:      body.Email,
@@ -84,7 +83,7 @@ func (h handler) UpdateChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 	err = h.service.UpdateChannel(r.Context(), entity.Channel{
 		Id:         id,
 		Kind:       body.Kind,
@@ -109,7 +108,7 @@ func (h handler) UpdateChannel(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} GetChannelsResponseItem
 // @router /v1/channels [get]
 func (h handler) GetChannels(w http.ResponseWriter, r *http.Request) {
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 	channels, err := h.service.GetChannels(r.Context(), user.Id)
 	if err != nil {
 		respond.Error(r.Context(), w, err)
@@ -144,7 +143,7 @@ func (h handler) DeleteChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := middleware.User(r.Context())
+	user := session.User(r.Context())
 	err = h.service.DeleteChannel(r.Context(), entity.DeleteChannel{Id: id, UserId: user.Id})
 	if err != nil {
 		respond.Error(r.Context(), w, err)
