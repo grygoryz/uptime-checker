@@ -15,7 +15,7 @@ type Channel interface {
 	Update(ctx context.Context, channel entity.Channel) error
 	GetMany(ctx context.Context, userId int) ([]entity.ChannelShort, error)
 	Delete(ctx context.Context, channel entity.DeleteChannel) error
-	GetChecksDependentOnChannel(ctx context.Context, id int) ([]int, error)
+	GetChecksDependentOnChannel(ctx context.Context, id int) ([]string, error)
 }
 
 type channelRepository struct {
@@ -125,7 +125,7 @@ func (r *channelRepository) CreateEmail(ctx context.Context, email string, userI
 }
 
 // GetChecksDependentOnChannel returns check ids that bound to this channel only
-func (r *channelRepository) GetChecksDependentOnChannel(ctx context.Context, id int) ([]int, error) {
+func (r *channelRepository) GetChecksDependentOnChannel(ctx context.Context, id int) ([]string, error) {
 	q := getQueryable(ctx, r.db)
 
 	query := `WITH checks_ids AS (SELECT check_id
@@ -137,7 +137,7 @@ func (r *channelRepository) GetChecksDependentOnChannel(ctx context.Context, id 
 	GROUP BY check_id
 	HAVING count(check_id) = 1`
 
-	var ids []int
+	var ids []string
 	err := q.SelectContext(ctx, &ids, query, id)
 	if err != nil {
 		return nil, err

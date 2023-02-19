@@ -113,7 +113,7 @@ func (h handler) CreateCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respond.JSON(r.Context(), w, http.StatusOK, CreateCheckResponse{Id: id})
+	respond.JSON(r.Context(), w, http.StatusCreated, CreateCheckResponse{Id: id})
 }
 
 // UpdateCheck updates check
@@ -134,7 +134,7 @@ func (h handler) UpdateCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := request.Body[CreateCheckBody](r, h.validator)
+	body, err := request.Body[UpdateCheckBody](r, h.validator)
 	if err != nil {
 		respond.Error(r.Context(), w, err)
 		return

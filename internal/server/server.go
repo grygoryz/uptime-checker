@@ -37,6 +37,13 @@ func New() *Server {
 	}
 }
 
+func NewTest() *Server {
+	return &Server{
+		router: chi.NewRouter(),
+		cfg:    config.NewTest(),
+	}
+}
+
 func (s *Server) Init() {
 	s.setGlobalMiddleware()
 	s.newDatabase()
@@ -47,7 +54,9 @@ func (s *Server) Init() {
 
 func (s *Server) setGlobalMiddleware() {
 	s.router.Use(chiMiddleware.RequestID)
-	s.router.Use(logger.Logger())
+	if s.cfg.Api.DisableLogging == false {
+		s.router.Use(logger.Logger())
+	}
 	s.router.Use(chiMiddleware.Recoverer)
 	s.router.Use(middleware.CORS)
 }
@@ -81,6 +90,14 @@ func (s *Server) Run() {
 		log.Fatalf("Server shutdown failed: %+v", err)
 	}
 	log.Println("Server shutdown success.")
+}
+
+func (s *Server) Router() *chi.Mux {
+	return s.router
+}
+
+func (s *Server) DB() *sqlx.DB {
+	return s.db
 }
 
 func (s *Server) gracefulShutdown() error {

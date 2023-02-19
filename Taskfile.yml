@@ -29,6 +29,17 @@ tasks:
       - task: swagger
       - go run cmd/server/main.go
 
+  test:run:
+    desc: Run test
+    dotenv: ['.env.test']
+    cmds:
+      - docker-compose -f ./docker-compose.test.yml down
+      - docker-compose -f ./docker-compose.test.yml up -d
+      - sleep 3
+      - migrate -path database/migrations -database pgx://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME up
+      - go test -v ./internal/...
+      - docker-compose -f ./docker-compose.test.yml down
+
   migrate:create:
     desc: Creates .sql migration files (Up and Down). Set name by appending with 'NAME=name_of_file'
     cmds:

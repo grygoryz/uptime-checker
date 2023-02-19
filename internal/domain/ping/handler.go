@@ -78,10 +78,14 @@ func (h handler) pingHandler(w http.ResponseWriter, r *http.Request, kind entity
 		return
 	}
 
-	r.Body = http.MaxBytesReader(w, r.Body, maxBodySize)
-	body, err := io.ReadAll(r.Body)
-	if err != nil && err != io.EOF {
-		log.Error().Err(err).Send()
+	body := ""
+	if r.Body != nil {
+		r.Body = http.MaxBytesReader(w, r.Body, maxBodySize)
+		b, err := io.ReadAll(r.Body)
+		if err != nil && err != io.EOF {
+			log.Error().Err(err).Send()
+		}
+		body = string(b)
 	}
 
 	err = h.service.CreatePing(r.Context(), entity.CreatePing{
@@ -89,7 +93,7 @@ func (h handler) pingHandler(w http.ResponseWriter, r *http.Request, kind entity
 		Type:      kind,
 		Source:    r.RemoteAddr,
 		UserAgent: r.UserAgent(),
-		Body:      string(body),
+		Body:      body,
 		Date:      time.Now(),
 	})
 	if err != nil {
