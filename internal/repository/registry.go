@@ -7,11 +7,11 @@ import (
 
 type Registry struct {
 	db      *sqlx.DB
-	User    User
-	Channel Channel
-	Check   Check
-	Ping    Ping
-	Flip    Flip
+	User    *userRepository
+	Channel *channelRepository
+	Check   *checkRepository
+	Ping    *pingRepository
+	Flip    *flipRepository
 }
 
 func NewRegistry(db *sqlx.DB) *Registry {

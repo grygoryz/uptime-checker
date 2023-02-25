@@ -6,12 +6,6 @@ import (
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
 )
 
-type Flip interface {
-	Create(ctx context.Context, flip entity.CreateFlip) error
-	GetTotal(ctx context.Context, params entity.GetFlipsTotal) (int, error)
-	GetMany(ctx context.Context, params entity.GetFlips) ([]entity.Flip, error)
-}
-
 type flipRepository struct {
 	db *sqlx.DB
 }

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"gitlab.com/grygoryz/uptime-checker/config"
 	"gitlab.com/grygoryz/uptime-checker/internal/domain/auth"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
 	"gitlab.com/grygoryz/uptime-checker/internal/server"
@@ -17,7 +18,8 @@ import (
 var s *server.Server
 
 func TestMain(m *testing.M) {
-	s = server.NewTest()
+	cfg := config.New(true)
+	s = server.New(cfg)
 	s.Init()
 	m.Run()
 }

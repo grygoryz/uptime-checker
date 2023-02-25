@@ -11,11 +11,11 @@ import (
 )
 
 type handler struct {
-	service   Service
+	service   *service
 	validator *validate.Validator
 }
 
-func RegisterHandler(router *chi.Mux, service Service, validator *validate.Validator, sessionRepo *session.Repository) {
+func RegisterHandler(router *chi.Mux, service *service, validator *validate.Validator, sessionRepo *session.Repository) {
 	h := handler{service: service, validator: validator}
 
 	authMiddleware := session.Auth(sessionRepo)

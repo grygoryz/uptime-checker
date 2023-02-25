@@ -8,15 +8,11 @@ import (
 	"math"
 )
 
-type Service interface {
-	CreatePing(ctx context.Context, ping entity.CreatePing) error
-}
-
 type service struct {
 	r *repository.Registry
 }
 
-func NewService(repositoryRegistry *repository.Registry) Service {
+func NewService(repositoryRegistry *repository.Registry) *service {
 	return &service{r: repositoryRegistry}
 }
 

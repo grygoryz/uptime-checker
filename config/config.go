@@ -13,26 +13,22 @@ type Config struct {
 	Redis    Redis
 }
 
-func New() Config {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println(err)
-	}
-
-	return Config{
-		Api:      apiCfg(),
-		Database: databaseCfg(),
-		Redis:    redisCfg(),
-	}
-}
-
-func NewTest() Config {
+func New(testing bool) Config {
 	re := regexp.MustCompile(`^(.*` + "uptime-checker" + `)`)
-	cwd, _ := os.Getwd()
-	rootPath := re.Find([]byte(cwd))
-	err := godotenv.Load(string(rootPath) + `/.env.test`)
+	cwd, err := os.Getwd()
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
+	}
+	rootPath := re.Find([]byte(cwd))
+
+	envFile := "/.env"
+	if testing {
+		envFile += ".test"
+	}
+
+	err = godotenv.Load(string(rootPath) + envFile)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return Config{

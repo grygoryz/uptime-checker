@@ -12,21 +12,6 @@ import (
 	"time"
 )
 
-type Check interface {
-	GetMany(ctx context.Context, userId int) ([]entity.Check, error)
-	Get(ctx context.Context, params entity.GetCheck) (entity.Check, error)
-	GetStatus(ctx context.Context, checkId string) (entity.CheckStatus, error)
-	Create(ctx context.Context, check entity.CreateCheck) (string, error)
-	Update(ctx context.Context, check entity.UpdateCheck) error
-	Delete(ctx context.Context, check entity.DeleteCheck) error
-	SetStatus(ctx context.Context, check entity.SetCheckStatus) error
-	AddChannels(ctx context.Context, params entity.AddChannels) error
-	DeleteChannels(ctx context.Context, checkId string) error
-	PingSuccess(ctx context.Context, checkId string, t time.Time) error
-	PingStart(ctx context.Context, checkId string, t time.Time) error
-	PingFail(ctx context.Context, checkId string, t time.Time) error
-}
-
 type checkRepository struct {
 	db *sqlx.DB
 }

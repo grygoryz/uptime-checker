@@ -8,18 +8,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Service interface {
-	SignIn(ctx context.Context, user SignInBody) (string, error)
-	SignUp(ctx context.Context, user SignUpBody) error
-	SignOut(ctx context.Context, sessionId string) error
-}
-
 type service struct {
 	r           *repository.Registry
 	sessionRepo *session.Repository
 }
 
-func NewService(repositoryRegistry *repository.Registry, sessionRepo *session.Repository) Service {
+func NewService(repositoryRegistry *repository.Registry, sessionRepo *session.Repository) *service {
 	return &service{r: repositoryRegistry, sessionRepo: sessionRepo}
 }
 

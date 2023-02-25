@@ -8,13 +8,6 @@ import (
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
 )
 
-type Ping interface {
-	Create(ctx context.Context, ping entity.CreatePing) error
-	GetLastTypeAndDate(ctx context.Context, checkId string) (*entity.PingTypeAndDate, error)
-	GetTotal(ctx context.Context, params entity.GetPingsTotal) (int, error)
-	GetMany(ctx context.Context, params entity.GetPings) ([]entity.Ping, error)
-}
-
 type pingRepository struct {
 	db *sqlx.DB
 }

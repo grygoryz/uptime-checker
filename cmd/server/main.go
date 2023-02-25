@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"gitlab.com/grygoryz/uptime-checker/config"
 	_ "gitlab.com/grygoryz/uptime-checker/docs"
 	"gitlab.com/grygoryz/uptime-checker/internal/server"
 	"log"
@@ -14,7 +15,8 @@ import (
 // @name                       sessionId
 func main() {
 	log.Println("Starting server...")
-	s := server.New()
+	cfg := config.New(false)
+	s := server.New(cfg)
 	s.Init()
 	s.Run()
 }

@@ -11,11 +11,6 @@ import (
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
 )
 
-type User interface {
-	Create(ctx context.Context, email string, password string) (int, error)
-	GetByEmail(ctx context.Context, email string) (entity.User, error)
-}
-
 type userRepository struct {
 	db *sqlx.DB
 }

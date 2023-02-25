@@ -12,11 +12,11 @@ import (
 )
 
 type handler struct {
-	service   Service
+	service   *service
 	validator *validate.Validator
 }
 
-func RegisterHandler(router *chi.Mux, service Service, validator *validate.Validator) {
+func RegisterHandler(router *chi.Mux, service *service, validator *validate.Validator) {
 	h := handler{service: service, validator: validator}
 
 	router.Route("/v1/pings", func(router chi.Router) {

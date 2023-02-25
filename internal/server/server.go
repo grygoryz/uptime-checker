@@ -30,17 +30,10 @@ type Server struct {
 	validator *validate.Validator
 }
 
-func New() *Server {
+func New(cfg config.Config) *Server {
 	return &Server{
 		router: chi.NewRouter(),
-		cfg:    config.New(),
-	}
-}
-
-func NewTest() *Server {
-	return &Server{
-		router: chi.NewRouter(),
-		cfg:    config.NewTest(),
+		cfg:    cfg,
 	}
 }
 

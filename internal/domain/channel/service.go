@@ -8,18 +8,11 @@ import (
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
 )
 
-type Service interface {
-	CreateChannel(ctx context.Context, channel entity.CreateChannel) (int, error)
-	UpdateChannel(ctx context.Context, channel entity.Channel) error
-	GetChannels(ctx context.Context, userId int) ([]entity.ChannelShort, error)
-	DeleteChannel(ctx context.Context, channel entity.DeleteChannel) error
-}
-
 type service struct {
 	r *repository.Registry
 }
 
-func NewService(repositoryRegistry *repository.Registry) Service {
+func NewService(repositoryRegistry *repository.Registry) *service {
 	return &service{r: repositoryRegistry}
 }
 

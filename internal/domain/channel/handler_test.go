@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"gitlab.com/grygoryz/uptime-checker/config"
 	"gitlab.com/grygoryz/uptime-checker/internal/domain/channel"
 	"gitlab.com/grygoryz/uptime-checker/internal/domain/check"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
@@ -17,7 +18,8 @@ import (
 var s *server.Server
 
 func TestMain(m *testing.M) {
-	s = server.NewTest()
+	cfg := config.New(true)
+	s = server.New(cfg)
 	s.Init()
 	m.Run()
 }

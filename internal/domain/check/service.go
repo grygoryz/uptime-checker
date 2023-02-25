@@ -8,22 +8,11 @@ import (
 	"time"
 )
 
-type Service interface {
-	GetChecks(ctx context.Context, userId int) ([]entity.Check, error)
-	GetCheck(ctx context.Context, userId int, checkId string) (entity.Check, error)
-	CreateCheck(ctx context.Context, check entity.CreateCheck, channels []int) (string, error)
-	UpdateCheck(ctx context.Context, check entity.UpdateCheck, channels []int) error
-	DeleteCheck(ctx context.Context, check entity.DeleteCheck) error
-	PauseCheck(ctx context.Context, checkId string, userId int) error
-	GetPings(ctx context.Context, params entity.GetPings) ([]entity.Ping, int, error)
-	GetFlips(ctx context.Context, params entity.GetFlips) ([]entity.Flip, int, error)
-}
-
 type service struct {
 	r *repository.Registry
 }
 
-func NewService(repositoryRegistry *repository.Registry) Service {
+func NewService(repositoryRegistry *repository.Registry) *service {
 	return &service{r: repositoryRegistry}
 }
 

@@ -9,15 +9,6 @@ import (
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
 )
 
-type Channel interface {
-	CreateEmail(ctx context.Context, email string, userId int) error
-	Create(ctx context.Context, channel entity.CreateChannel) (int, error)
-	Update(ctx context.Context, channel entity.Channel) error
-	GetMany(ctx context.Context, userId int) ([]entity.ChannelShort, error)
-	Delete(ctx context.Context, channel entity.DeleteChannel) error
-	GetChecksDependentOnChannel(ctx context.Context, id int) ([]string, error)
-}
-
 type channelRepository struct {
 	db *sqlx.DB
 }
