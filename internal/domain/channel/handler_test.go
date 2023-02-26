@@ -50,7 +50,11 @@ func TestHandler_CreateChannel_ValidInput(t *testing.T) {
 	dtoEmail := channel.CreateChannelBody{Kind: entity.EmailChannel, Email: "test1@test.com"}
 	chEmail := createChannel(t, cookie, dtoEmail)
 
-	dtoWebhook := channel.CreateChannelBody{Kind: entity.WebhookChannel, WebhookURL: "https://test.com"}
+	dtoWebhook := channel.CreateChannelBody{
+		Kind:           entity.WebhookChannel,
+		WebhookURLUp:   "https://test.com/up",
+		WebhookURLDown: "https://test.com/down",
+	}
 	chWebhook := createChannel(t, cookie, dtoWebhook)
 
 	req, _ := http.NewRequest("GET", "/v1/channels", nil)
@@ -64,13 +68,30 @@ func TestHandler_CreateChannel_ValidInput(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	hasEmail := false
+	hasWebhook := false
 	for _, c := range channels {
-		if c.Id == chEmail.Id && (c.Kind != dtoEmail.Kind || *c.Email != dtoEmail.Email) {
-			t.Errorf("want channel of type %v and with email %v to exist", dtoEmail.Kind, dtoEmail.Email)
+		if c.Id == chEmail.Id {
+			hasEmail = true
+			if c.Kind != dtoEmail.Kind || *c.Email != dtoEmail.Email {
+				t.Errorf("want channel of type %v and with email %v to exist", dtoEmail.Kind, dtoEmail.Email)
+			}
 		}
-		if c.Id == chWebhook.Id && (c.Kind != dtoWebhook.Kind || *c.WebhookURL != dtoWebhook.WebhookURL) {
-			t.Errorf("want channel of type %v and with webhook url %v to exist", dtoWebhook.Kind, dtoWebhook.WebhookURL)
+		if c.Id == chWebhook.Id {
+			hasWebhook = true
+			if c.Kind != dtoWebhook.Kind || *c.WebhookURLUp != dtoWebhook.WebhookURLUp || *c.WebhookURLDown != dtoWebhook.WebhookURLDown {
+				t.Errorf(
+					"want channel of type %v with webhook url up %v and webhook url down %v, got webhook url up %v and webhook url down %v",
+					dtoWebhook.Kind, dtoWebhook.WebhookURLUp, dtoWebhook.WebhookURLDown, *c.WebhookURLUp, *c.WebhookURLDown)
+			}
+
 		}
+	}
+	if !hasEmail {
+		t.Errorf("want channel of type %v and with email %v to exist", dtoEmail.Kind, dtoEmail.Email)
+	}
+	if !hasWebhook {
+		t.Errorf("want channel of type %v and with webhook url up %v and webhook url down %v to exist", dtoWebhook.Kind, dtoWebhook.WebhookURLUp, dtoWebhook.WebhookURLDown)
 	}
 }
 
@@ -87,7 +108,11 @@ func TestHandler_CreateChannel_InalidInput(t *testing.T) {
 		},
 		{
 			name: "email kind without Email field",
-			dto:  channel.CreateChannelBody{Kind: entity.EmailChannel, WebhookURL: "https://example.com"},
+			dto: channel.CreateChannelBody{
+				Kind:           entity.EmailChannel,
+				WebhookURLUp:   "https://test.com/up",
+				WebhookURLDown: "https://test.com/down",
+			},
 		},
 		{
 			name: "webhook kind without WebhookURL field",
@@ -120,7 +145,11 @@ func TestHandler_UpdateChannel_ValidInput(t *testing.T) {
 	ch := createChannel(t, cookie, channel.CreateChannelBody{Kind: entity.EmailChannel, Email: "test1@test.com"})
 
 	// update channel
-	newDTO := channel.UpdateChannelBody{Kind: entity.WebhookChannel, WebhookURL: "https://test.com"}
+	newDTO := channel.UpdateChannelBody{
+		Kind:           entity.WebhookChannel,
+		WebhookURLUp:   "https://test.com/up",
+		WebhookURLDown: "https://test.com/down",
+	}
 	body, err := json.Marshal(newDTO)
 	if err != nil {
 		t.Fatal(err)
@@ -143,8 +172,10 @@ func TestHandler_UpdateChannel_ValidInput(t *testing.T) {
 	}
 
 	for _, c := range channels {
-		if c.Id == ch.Id && (c.Kind != newDTO.Kind || *c.WebhookURL != newDTO.WebhookURL) {
-			t.Errorf("want channel of type %v and with webhook url %v to exist", newDTO.Kind, newDTO.WebhookURL)
+		if c.Id == ch.Id && (c.Kind != newDTO.Kind || *c.WebhookURLUp != newDTO.WebhookURLUp || *c.WebhookURLDown != newDTO.WebhookURLDown) {
+			t.Errorf(
+				"want channel of type %v with webhook url up %v and webhook url down %v, got webhook url up %v and webhook url down %v",
+				newDTO.Kind, newDTO.WebhookURLUp, newDTO.WebhookURLDown, *c.WebhookURLUp, *c.WebhookURLDown)
 		}
 	}
 }
@@ -164,7 +195,11 @@ func TestHandler_UpdateChannel_InvalidInput(t *testing.T) {
 		},
 		{
 			name: "email kind without Email field",
-			dto:  channel.UpdateChannelBody{Kind: entity.EmailChannel, WebhookURL: "https://example.com"},
+			dto: channel.UpdateChannelBody{
+				Kind:           entity.EmailChannel,
+				WebhookURLUp:   "https://test.com/up",
+				WebhookURLDown: "https://test.com/down",
+			},
 		},
 		{
 			name: "webhook kind without WebhookURL field",

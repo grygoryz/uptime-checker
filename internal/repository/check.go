@@ -38,7 +38,8 @@ func (r *checkRepository) GetMany(ctx context.Context, userId int) ([]entity.Che
            'id', id,
            'kind', kind,
            'email', email,
-           'webhook_url', webhook_url
+           'webhook_url_up', webhook_url_up,
+           'webhook_url_down', webhook_url_down
        )) channels
         FROM checks_channels
         INNER JOIN channels on checks_channels.channel_id = channels.id
@@ -71,7 +72,8 @@ func (r *checkRepository) Get(ctx context.Context, params entity.GetCheck) (enti
            'id', id,
            'kind', kind,
            'email', email,
-           'webhook_url', webhook_url
+           'webhook_url_up', webhook_url_up,
+           'webhook_url_down', webhook_url_down
        ))
         FROM checks_channels
         INNER JOIN channels on checks_channels.channel_id = channels.id

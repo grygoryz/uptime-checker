@@ -28,8 +28,8 @@ func (r *channelRepository) Create(ctx context.Context, channel entity.CreateCha
 		query := "INSERT INTO channels (kind, email, user_id) VALUES ($1, $2, $3) RETURNING id"
 		err = q.QueryRowxContext(ctx, query, channel.Kind, channel.Email, channel.UserId).Scan(&id)
 	case entity.WebhookChannel:
-		query := "INSERT INTO channels (kind, webhook_url, user_id) VALUES ($1, $2, $3) RETURNING id"
-		err = q.QueryRowxContext(ctx, query, channel.Kind, channel.WebhookURL, channel.UserId).Scan(&id)
+		query := "INSERT INTO channels (kind, webhook_url_up, webhook_url_down, user_id) VALUES ($1, $2, $3, $4) RETURNING id"
+		err = q.QueryRowxContext(ctx, query, channel.Kind, channel.WebhookURLUp, channel.WebhookURLDown, channel.UserId).Scan(&id)
 	default:
 		return 0, fmt.Errorf("invalid channel kind: %v", channel.Kind)
 	}
@@ -48,11 +48,11 @@ func (r *channelRepository) Update(ctx context.Context, channel entity.Channel) 
 	var err error
 	switch channel.Kind {
 	case entity.EmailChannel:
-		query := "UPDATE channels SET kind = $1, email = $2, webhook_url = null WHERE id = $3 AND user_id = $4"
+		query := "UPDATE channels SET kind = $1, email = $2, webhook_url_up = null, webhook_url_down = null WHERE id = $3 AND user_id = $4"
 		result, err = q.ExecContext(ctx, query, channel.Kind, channel.Email, channel.Id, channel.UserId)
 	case entity.WebhookChannel:
-		query := "UPDATE channels SET kind = $1, webhook_url = $2, email = null WHERE id = $3 AND user_id = $4"
-		result, err = q.ExecContext(ctx, query, channel.Kind, channel.WebhookURL, channel.Id, channel.UserId)
+		query := "UPDATE channels SET kind = $1, webhook_url_up = $2, webhook_url_down = $3, email = null WHERE id = $4 AND user_id = $5"
+		result, err = q.ExecContext(ctx, query, channel.Kind, channel.WebhookURLUp, channel.WebhookURLDown, channel.Id, channel.UserId)
 	default:
 		return fmt.Errorf("invalid channel kind: %v", channel.Kind)
 	}
@@ -73,7 +73,7 @@ func (r *channelRepository) GetMany(ctx context.Context, userId int) ([]entity.C
 	q := getQueryable(ctx, r.db)
 	var channels []entity.ChannelShort
 
-	query := "SELECT id, kind, email, webhook_url FROM channels WHERE user_id = $1"
+	query := "SELECT id, kind, email, webhook_url_up, webhook_url_down FROM channels WHERE user_id = $1"
 	err := q.SelectContext(ctx, &channels, query, userId)
 	if err != nil {
 		return nil, err

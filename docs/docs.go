@@ -778,7 +778,10 @@ const docTemplate = `{
                         }
                     ]
                 },
-                "webhookURL": {
+                "webhookURLDown": {
+                    "type": "string"
+                },
+                "webhookURLUp": {
                     "type": "string"
                 }
             }
@@ -810,7 +813,10 @@ const docTemplate = `{
                 "kind": {
                     "$ref": "#/definitions/entity.ChannelKind"
                 },
-                "webhookURL": {
+                "webhookURLDown": {
+                    "type": "string"
+                },
+                "webhookURLUp": {
                     "type": "string"
                 }
             }
@@ -835,7 +841,10 @@ const docTemplate = `{
                         }
                     ]
                 },
-                "webhookURL": {
+                "webhookURLDown": {
+                    "type": "string"
+                },
+                "webhookURLUp": {
                     "type": "string"
                 }
             }
@@ -856,7 +865,10 @@ const docTemplate = `{
                 "kind": {
                     "$ref": "#/definitions/entity.ChannelKind"
                 },
-                "webhookURL": {
+                "webhookURLDown": {
+                    "type": "string"
+                },
+                "webhookURLUp": {
                     "type": "string"
                 }
             }

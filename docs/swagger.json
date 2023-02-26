@@ -768,7 +768,10 @@
                         }
                     ]
                 },
-                "webhookURL": {
+                "webhookURLDown": {
+                    "type": "string"
+                },
+                "webhookURLUp": {
                     "type": "string"
                 }
             }
@@ -800,7 +803,10 @@
                 "kind": {
                     "$ref": "#/definitions/entity.ChannelKind"
                 },
-                "webhookURL": {
+                "webhookURLDown": {
+                    "type": "string"
+                },
+                "webhookURLUp": {
                     "type": "string"
                 }
             }
@@ -825,7 +831,10 @@
                         }
                     ]
                 },
-                "webhookURL": {
+                "webhookURLDown": {
+                    "type": "string"
+                },
+                "webhookURLUp": {
                     "type": "string"
                 }
             }
@@ -846,7 +855,10 @@
                 "kind": {
                     "$ref": "#/definitions/entity.ChannelKind"
                 },
-                "webhookURL": {
+                "webhookURLDown": {
+                    "type": "string"
+                },
+                "webhookURLUp": {
                     "type": "string"
                 }
             }

@@ -45,7 +45,9 @@ definitions:
         enum:
         - email
         - webhook
-      webhookURL:
+      webhookURLDown:
+        type: string
+      webhookURLUp:
         type: string
     required:
     - kind
@@ -65,7 +67,9 @@ definitions:
         type: integer
       kind:
         $ref: '#/definitions/entity.ChannelKind'
-      webhookURL:
+      webhookURLDown:
+        type: string
+      webhookURLUp:
         type: string
     required:
     - id
@@ -81,7 +85,9 @@ definitions:
         enum:
         - email
         - webhook
-      webhookURL:
+      webhookURLDown:
+        type: string
+      webhookURLUp:
         type: string
     required:
     - kind
@@ -94,7 +100,9 @@ definitions:
         type: integer
       kind:
         $ref: '#/definitions/entity.ChannelKind'
-      webhookURL:
+      webhookURLDown:
+        type: string
+      webhookURLUp:
         type: string
     required:
     - id

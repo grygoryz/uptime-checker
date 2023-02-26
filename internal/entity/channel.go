@@ -13,18 +13,20 @@ const (
 )
 
 type Channel struct {
-	Id         int         `db:"id"`
-	Kind       ChannelKind `db:"kind"`
-	Email      string      `db:"email"`
-	WebhookURL string      `db:"webhook_url"`
-	UserId     int         `db:"user_id"`
+	Id             int         `db:"id"`
+	Kind           ChannelKind `db:"kind"`
+	Email          string      `db:"email"`
+	WebhookURLUp   string      `db:"webhook_url_up"`
+	WebhookURLDown string      `db:"webhook_url_down"`
+	UserId         int         `db:"user_id"`
 }
 
 type ChannelShort struct {
-	Id         int         `db:"id"`
-	Kind       ChannelKind `db:"kind"`
-	Email      *string     `db:"email"`
-	WebhookURL *string     `db:"webhook_url"`
+	Id             int         `db:"id"`
+	Kind           ChannelKind `db:"kind"`
+	Email          *string     `db:"email"`
+	WebhookURLUp   *string     `db:"webhook_url_up"`
+	WebhookURLDown *string     `db:"webhook_url_down"`
 }
 
 type Channels []ChannelShort
@@ -42,10 +44,11 @@ func (c *Channels) Scan(v interface{}) error {
 }
 
 type CreateChannel struct {
-	Kind       ChannelKind
-	Email      string
-	WebhookURL string
-	UserId     int
+	Kind           ChannelKind
+	Email          string
+	WebhookURLUp   string
+	WebhookURLDown string
+	UserId         int
 }
 
 type DeleteChannel struct {

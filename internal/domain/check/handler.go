@@ -387,10 +387,11 @@ func checkDTO(check entity.Check) Check {
 	}
 	for i, channel := range check.Channels {
 		response.Channels[i] = Channel{
-			Id:         channel.Id,
-			Kind:       channel.Kind,
-			Email:      channel.Email,
-			WebhookURL: channel.WebhookURL,
+			Id:             channel.Id,
+			Kind:           channel.Kind,
+			Email:          channel.Email,
+			WebhookURLUp:   channel.WebhookURLUp,
+			WebhookURLDown: channel.WebhookURLDown,
 		}
 	}
 

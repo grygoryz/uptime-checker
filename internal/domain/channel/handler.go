@@ -47,10 +47,11 @@ func (h handler) CreateChannel(w http.ResponseWriter, r *http.Request) {
 
 	user := session.User(r.Context())
 	id, err := h.service.CreateChannel(r.Context(), entity.CreateChannel{
-		Kind:       body.Kind,
-		Email:      body.Email,
-		WebhookURL: body.WebhookURL,
-		UserId:     user.Id,
+		Kind:           body.Kind,
+		Email:          body.Email,
+		WebhookURLUp:   body.WebhookURLUp,
+		WebhookURLDown: body.WebhookURLDown,
+		UserId:         user.Id,
 	})
 	if err != nil {
 		respond.Error(r.Context(), w, err)
@@ -85,11 +86,12 @@ func (h handler) UpdateChannel(w http.ResponseWriter, r *http.Request) {
 
 	user := session.User(r.Context())
 	err = h.service.UpdateChannel(r.Context(), entity.Channel{
-		Id:         id,
-		Kind:       body.Kind,
-		Email:      body.Email,
-		WebhookURL: body.WebhookURL,
-		UserId:     user.Id,
+		Id:             id,
+		Kind:           body.Kind,
+		Email:          body.Email,
+		WebhookURLUp:   body.WebhookURLUp,
+		WebhookURLDown: body.WebhookURLDown,
+		UserId:         user.Id,
 	})
 	if err != nil {
 		respond.Error(r.Context(), w, err)
@@ -118,10 +120,11 @@ func (h handler) GetChannels(w http.ResponseWriter, r *http.Request) {
 	response := make([]GetChannelsResponseItem, len(channels))
 	for i, channel := range channels {
 		response[i] = GetChannelsResponseItem{
-			Id:         channel.Id,
-			Kind:       channel.Kind,
-			Email:      channel.Email,
-			WebhookURL: channel.WebhookURL,
+			Id:             channel.Id,
+			Kind:           channel.Kind,
+			Email:          channel.Email,
+			WebhookURLUp:   channel.WebhookURLUp,
+			WebhookURLDown: channel.WebhookURLDown,
 		}
 	}
 	respond.JSON(r.Context(), w, http.StatusOK, response)

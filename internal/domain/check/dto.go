@@ -19,10 +19,11 @@ type Check struct {
 }
 
 type Channel struct {
-	Id         int                `json:"id" validate:"required"`
-	Kind       entity.ChannelKind `json:"kind" validate:"required"`
-	Email      *string            `json:"email,omitempty"`
-	WebhookURL *string            `json:"webhookURL,omitempty"`
+	Id             int                `json:"id" validate:"required"`
+	Kind           entity.ChannelKind `json:"kind" validate:"required"`
+	Email          *string            `json:"email,omitempty"`
+	WebhookURLUp   *string            `json:"webhookURLUp,omitempty"`
+	WebhookURLDown *string            `json:"webhookURLDown,omitempty"`
 }
 
 type CheckIdParam struct {
