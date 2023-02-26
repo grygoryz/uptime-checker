@@ -47,6 +47,7 @@ func (s *Server) Init() {
 
 func (s *Server) setGlobalMiddleware() {
 	s.router.Use(chiMiddleware.RequestID)
+
 	if s.cfg.Api.DisableLogging == false {
 		s.router.Use(logger.Logger())
 	}

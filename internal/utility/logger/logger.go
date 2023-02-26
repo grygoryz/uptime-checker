@@ -8,12 +8,18 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
 )
 
 var skipHeaders = []string{"Set-Cookie", "Cookie"}
+
+type Bodies struct {
+	ResBody []byte
+	ReqBody []byte
+}
 
 func Logger() func(next http.Handler) http.Handler {
 	hostname, err := os.Hostname()
@@ -25,18 +31,25 @@ func Logger() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			entry := f.NewLogEntry(r)
-			ww := chiMiddleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
-			buf := bytes.NewBuffer(make([]byte, 0, 512))
-			ww.Tee(buf)
+			ww := chiMiddleware.NewWrapResponseWriter(w, r.ProtoMajor)
+			resBuf := bytes.NewBuffer(make([]byte, 0))
+			ww.Tee(resBuf)
+
+			reqBuf := bytes.NewBuffer(make([]byte, 0))
+			r.Body = ioutil.NopCloser(io.TeeReader(r.Body, reqBuf))
 
 			t := time.Now()
 			defer func() {
-				var resBody []byte
-				if ww.Status() >= http.StatusBadRequest {
-					resBody, _ = io.ReadAll(buf)
+				extra := Bodies{
+					ResBody: nil,
+					ReqBody: nil,
 				}
-				entry.Write(ww.Status(), ww.BytesWritten(), ww.Header(), time.Since(t), resBody)
+				if ww.Status() >= http.StatusBadRequest {
+					extra.ResBody = resBuf.Bytes()
+					extra.ReqBody = reqBuf.Bytes()
+				}
+				entry.Write(ww.Status(), ww.BytesWritten(), ww.Header(), time.Since(t), extra)
 			}()
 
 			next.ServeHTTP(ww, chiMiddleware.WithLogEntry(r, entry))
@@ -71,12 +84,15 @@ func (l *RequestLoggerEntry) Write(status int, bytes int, header http.Header, el
 		dict.Dict("headers", getHeaderLogDict(header))
 	}
 
+	lg := l.Logger.WithLevel(statusLevel(status))
+
+	bodies, _ := extra.(Bodies)
 	if status >= http.StatusBadRequest {
-		body, _ := extra.([]byte)
-		dict.Str("body", string(body))
+		dict.Str("body", string(bodies.ResBody))
+		lg.Str("reqBody", string(bodies.ReqBody))
 	}
 
-	l.Logger.WithLevel(statusLevel(status)).Dict("response", dict).Msg("request completed")
+	lg.Dict("response", dict).Msg("request completed")
 }
 
 func (l *RequestLoggerEntry) Panic(v interface{}, stack []byte) {
