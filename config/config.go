@@ -11,6 +11,7 @@ type Config struct {
 	Api      Api
 	Database Database
 	Redis    Redis
+	RabbitMQ RabbitMQ
 }
 
 func New(testing bool) Config {
@@ -35,5 +36,6 @@ func New(testing bool) Config {
 		Api:      apiCfg(),
 		Database: databaseCfg(),
 		Redis:    redisCfg(),
+		RabbitMQ: rabbitMQCfg(),
 	}
 }

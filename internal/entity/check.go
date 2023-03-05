@@ -64,3 +64,12 @@ type AddChannels struct {
 	Id       string
 	Channels []int
 }
+
+type CheckExpired struct {
+	Id        string     `db:"id"`
+	Name      string     `db:"name"`
+	Grace     int        `db:"grace"`
+	NextPing  *time.Time `db:"next_ping"`
+	UserEmail string     `db:"email"`
+	Channels  Channels   `db:"channels"`
+}

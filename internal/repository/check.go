@@ -322,3 +322,52 @@ func (r *checkRepository) PingFail(ctx context.Context, checkId string, t time.T
 
 	return nil
 }
+
+// GetExpired returns expired checks
+func (r *checkRepository) GetExpired(ctx context.Context) ([]entity.CheckExpired, error) {
+	q := getQueryable(ctx, r.db)
+	var checks []entity.CheckExpired
+
+	query := `SELECT
+    ch.id,
+    "name",
+    next_ping, 
+    grace,
+    u.email,
+    (SELECT json_agg(json_build_object(
+           'kind', kind,
+           'email', email,
+           'webhook_url_up', webhook_url_up,
+           'webhook_url_down', webhook_url_down
+    )) channels
+    FROM checks_channels
+    INNER JOIN channels on checks_channels.channel_id = channels.id
+    WHERE checks_channels.check_id = ch.id) channels
+	FROM checks ch
+	INNER JOIN users u on u.id = ch.used_id
+	WHERE status = 'up' AND current_timestamp > (next_ping + (concat(grace, 's'))::interval)
+	FOR UPDATE SKIP LOCKED`
+	err := q.SelectContext(ctx, &checks, query)
+	if err != nil {
+		return nil, err
+	}
+
+	return checks, nil
+}
+
+// SetDown sets checks status to down and next ping to status "down"
+func (r *checkRepository) SetDown(ctx context.Context, checkIds []string) error {
+	q := getQueryable(ctx, r.db)
+
+	query, args, err := sqlx.In(`UPDATE checks
+	SET next_ping    = NULL,
+    	status       = 'down'
+	WHERE id IN (?);`, checkIds)
+	query = r.db.Rebind(query)
+	_, err = q.ExecContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

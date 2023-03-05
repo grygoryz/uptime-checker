@@ -114,8 +114,6 @@ func (s *Server) gracefulShutdown() error {
 			log.Printf("Redis shutdown failed: %+v\n", err)
 		}
 		log.Println("Redis shutdown success.")
-
-		// TODO: close rabbit. smtp
 	}()
 
 	return s.httpServer.Shutdown(ctx)

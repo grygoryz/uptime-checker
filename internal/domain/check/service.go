@@ -2,6 +2,7 @@ package check
 
 import (
 	"context"
+	"database/sql"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
@@ -39,7 +40,7 @@ func (s *service) CreateCheck(ctx context.Context, check entity.CreateCheck, cha
 		}
 
 		return nil
-	})
+	}, sql.LevelDefault)
 
 	return id, err
 }
@@ -62,7 +63,7 @@ func (s *service) UpdateCheck(ctx context.Context, check entity.UpdateCheck, cha
 		}
 
 		return nil
-	})
+	}, sql.LevelDefault)
 }
 
 func (s *service) DeleteCheck(ctx context.Context, check entity.DeleteCheck) error {
@@ -95,7 +96,7 @@ func (s *service) PauseCheck(ctx context.Context, checkId string, userId int) er
 		}
 
 		return nil
-	})
+	}, sql.LevelDefault)
 }
 
 func (s *service) GetPings(ctx context.Context, params entity.GetPings) ([]entity.Ping, int, error) {
@@ -118,7 +119,7 @@ func (s *service) GetPings(ctx context.Context, params entity.GetPings) ([]entit
 		}
 
 		return nil
-	})
+	}, sql.LevelDefault)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -146,7 +147,7 @@ func (s *service) GetFlips(ctx context.Context, params entity.GetFlips) ([]entit
 		}
 
 		return nil
-	})
+	}, sql.LevelDefault)
 	if err != nil {
 		return nil, 0, err
 	}

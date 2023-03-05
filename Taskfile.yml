@@ -29,6 +29,11 @@ tasks:
       - task: swagger
       - go run cmd/server/main.go
 
+  poller:run:
+    desc: Runs the poller
+    cmds:
+      - go run cmd/poller/main.go
+
   test:run:
     desc: Run test
     dotenv: ['.env.test']

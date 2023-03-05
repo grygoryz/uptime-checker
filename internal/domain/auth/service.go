@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"database/sql"
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
 	"gitlab.com/grygoryz/uptime-checker/internal/session"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
@@ -35,7 +36,7 @@ func (svc *service) SignUp(ctx context.Context, user SignUpBody) error {
 		}
 
 		return nil
-	})
+	}, sql.LevelDefault)
 }
 
 func (svc *service) SignIn(ctx context.Context, user SignInBody) (string, error) {

@@ -34,3 +34,12 @@ type Flip struct {
 	To   FlipState `db:"to"`
 	Date time.Time `db:"date"`
 }
+
+type FlipUnprocessed struct {
+	Id            int       `db:"id"`
+	To            FlipState `db:"to"`
+	Date          time.Time `db:"date"`
+	CheckName     string    `db:"name"`
+	UserEmail     string    `db:"email"`
+	CheckChannels Channels  `db:"channels"`
+}
