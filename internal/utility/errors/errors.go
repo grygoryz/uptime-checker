@@ -21,6 +21,7 @@ func (e AppError) Error() string {
 	return e.msg
 }
 
+// E creates AppError
 func E(args ...interface{}) AppError {
 	e := AppError{}
 	for _, arg := range args {

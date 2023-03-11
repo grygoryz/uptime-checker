@@ -39,6 +39,7 @@ func New() *Validator {
 	return &Validator{validator: v, ut: trans}
 }
 
+// Struct validates struct
 func (v *Validator) Struct(s interface{}) error {
 	err := v.validator.Struct(s)
 	if err != nil {

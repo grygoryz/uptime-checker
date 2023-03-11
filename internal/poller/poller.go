@@ -1,3 +1,5 @@
+// Package poller implements the polling mechanism for checking expired checks and unprocessed flips.
+// It updates status of expired checks and transforms them to flips and then sends all the flips to queue.
 package poller
 
 import (

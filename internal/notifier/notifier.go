@@ -1,3 +1,6 @@
+// Package notifier implements a notification system that consumes flip notifications from a queue concurrently
+// and notifies users through provided channels. The notifier handles emails and webhooks, and sends
+// them to the respective recipients.
 package notifier
 
 import (

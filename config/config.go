@@ -15,6 +15,8 @@ type Config struct {
 	Mailjet  Mailjet
 }
 
+// New loads environment variables from the root file (.env or .env.test if testing is set to true) and returns
+// a new Config instance filled with the loaded variables.
 func New(testing bool) Config {
 	re := regexp.MustCompile(`^(.*` + "uptime-checker" + `)`)
 	cwd, err := os.Getwd()

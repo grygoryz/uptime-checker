@@ -26,6 +26,7 @@ const publishTimeout = time.Second * 5
 const reconnectDelay = time.Second
 const reInitDelay = time.Second
 
+// New creates Queue and blocks until connected to broker
 func New(cfg config.Config) *Queue {
 	queue := Queue{done: make(chan struct{})}
 
@@ -147,6 +148,7 @@ func (q *Queue) Consume(handler func(msg amqp.Delivery) bool, concurrency int) e
 	return nil
 }
 
+// Close closes the channel and connection
 func (q *Queue) Close() error {
 	close(q.done)
 	err := q.ch.Close()
