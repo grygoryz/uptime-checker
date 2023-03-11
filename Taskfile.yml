@@ -34,6 +34,11 @@ tasks:
     cmds:
       - go run cmd/poller/main.go
 
+  notifier:run:
+    desc: Runs the notifier
+    cmds:
+      - go run cmd/notifier/main.go
+
   test:run:
     desc: Run test
     dotenv: ['.env.test']

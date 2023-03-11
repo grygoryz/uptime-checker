@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
 	"gitlab.com/grygoryz/uptime-checker/config"
@@ -14,8 +15,8 @@ type Queue struct {
 	conn            *amqp.Connection
 	notifyConnClose chan *amqp.Error
 
-	ch              *amqp.Channel
-	notifyChanClose chan *amqp.Error
+	ch            *amqp.Channel
+	notifyChClose chan *amqp.Error
 
 	done chan struct{}
 }
@@ -37,6 +38,16 @@ func New(cfg config.Config) *Queue {
 	)
 	go queue.handleReconnect(addr)
 
+	// block until connected
+loop:
+	for queue.conn == nil || queue.ch == nil {
+		select {
+		case <-queue.done:
+			break loop
+		case <-time.After(time.Second):
+		}
+	}
+
 	return &queue
 }
 
@@ -44,6 +55,10 @@ func New(cfg config.Config) *Queue {
 func (q *Queue) PublishBatch(ctx context.Context, messages [][]byte) error {
 	confirmations := make([]*amqp.DeferredConfirmation, len(messages))
 	for i, m := range messages {
+		id, err := uuid.NewRandom()
+		if err != nil {
+			return err
+		}
 		for {
 			confirmation, err := q.ch.PublishWithDeferredConfirmWithContext(
 				ctx,
@@ -55,6 +70,7 @@ func (q *Queue) PublishBatch(ctx context.Context, messages [][]byte) error {
 					ContentType:  "application/json",
 					Body:         m,
 					DeliveryMode: amqp.Persistent,
+					MessageId:    id.String(),
 				})
 			if err == nil {
 				confirmations[i] = confirmation
@@ -82,6 +98,50 @@ func (q *Queue) PublishBatch(ctx context.Context, messages [][]byte) error {
 		if !acked {
 			return fmt.Errorf("publishing nacked with delivery tag: %v", confirmation.DeliveryTag)
 		}
+	}
+
+	return nil
+}
+
+// Consume concurrently consumes messages from queue and provides it to handler
+func (q *Queue) Consume(handler func(msg amqp.Delivery) bool, concurrency int) error {
+	if err := q.ch.Qos(
+		concurrency*2,
+		0,
+		false,
+	); err != nil {
+		return err
+	}
+
+	msgs, err := q.ch.Consume(
+		queueName,
+		"",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < concurrency; i++ {
+		log.Info().Msgf("Start goroutine: %v", i)
+		go func(i int) {
+			for msg := range msgs {
+				if handler(msg) {
+					if err := msg.Ack(false); err != nil {
+						log.Err(err).Msg("Error acknowledging message")
+					}
+				} else {
+					if err := msg.Nack(false, true); err != nil {
+						log.Err(err).Msg("Error non-acknowledging message")
+					}
+				}
+			}
+			log.Info().Msgf("Stop goroutine: %v", i)
+		}(i)
 	}
 
 	return nil
@@ -143,7 +203,7 @@ func (q *Queue) handleReInit(conn *amqp.Connection) bool {
 		case <-q.notifyConnClose:
 			log.Info().Msg("Connection closed. Reconnecting...")
 			return false
-		case <-q.notifyChanClose:
+		case <-q.notifyChClose:
 			log.Info().Msg("Channel closed. Re-running init...")
 		}
 	}
@@ -174,8 +234,8 @@ func (q *Queue) init(conn *amqp.Connection) error {
 	}
 
 	q.ch = ch
-	q.notifyChanClose = make(chan *amqp.Error, 1)
-	q.ch.NotifyClose(q.notifyChanClose)
+	q.notifyChClose = make(chan *amqp.Error, 1)
+	q.ch.NotifyClose(q.notifyChClose)
 
 	return nil
 }

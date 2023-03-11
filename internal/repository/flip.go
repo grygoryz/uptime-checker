@@ -72,7 +72,6 @@ func (r *flipRepository) GetUnprocessed(ctx context.Context) ([]entity.FlipUnpro
     "date",
     "to",
     ch.name,
-    u.email,
     (SELECT json_agg(json_build_object(
            'kind', kind,
            'email', email,
@@ -84,7 +83,6 @@ func (r *flipRepository) GetUnprocessed(ctx context.Context) ([]entity.FlipUnpro
     WHERE checks_channels.check_id = ch.id) channels
     FROM flips f
     INNER JOIN checks ch on ch.id = f.check_id
-    INNER JOIN users u on u.id = ch.used_id
 	WHERE processed = false AND "to" IN ('up', 'down')
 	ORDER BY date
 	FOR UPDATE SKIP LOCKED`

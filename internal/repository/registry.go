@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -32,8 +31,8 @@ type txKey struct{}
 
 // WithTx wraps function in transaction by providing *sqlx.Tx into the context. Transactions work only for
 // repositories of the Registry
-func (r *Registry) WithTx(ctx context.Context, fn txFn, level sql.IsolationLevel) error {
-	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{Isolation: sql.LevelRepeatableRead})
+func (r *Registry) WithTx(ctx context.Context, fn txFn) error {
+	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return err
 	}

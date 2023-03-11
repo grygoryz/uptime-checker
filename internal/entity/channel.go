@@ -22,11 +22,11 @@ type Channel struct {
 }
 
 type ChannelShort struct {
-	Id             int         `db:"id"`
-	Kind           ChannelKind `db:"kind"`
-	Email          *string     `db:"email"`
-	WebhookURLUp   *string     `db:"webhook_url_up"`
-	WebhookURLDown *string     `db:"webhook_url_down"`
+	Id             int         `db:"id" json:"id"`
+	Kind           ChannelKind `db:"kind" json:"kind"`
+	Email          *string     `db:"email" json:"email"`
+	WebhookURLUp   *string     `db:"webhook_url_up" json:"webhook_url_up"`
+	WebhookURLDown *string     `db:"webhook_url_down" json:"webhook_url_down"`
 }
 
 type Channels []ChannelShort

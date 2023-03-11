@@ -3,8 +3,8 @@ package database
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/rs/zerolog/log"
 	"gitlab.com/grygoryz/uptime-checker/config"
-	"log"
 )
 
 func New(cfg config.Config) *sqlx.DB {
@@ -12,7 +12,7 @@ func New(cfg config.Config) *sqlx.DB {
 		cfg.Database.User, cfg.Database.Password, cfg.Database.Host, cfg.Database.Port, cfg.Database.Name)
 	db, err := sqlx.Connect("pgx", dsn)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal().Err(err).Send()
 	}
 
 	return db

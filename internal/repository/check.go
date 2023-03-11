@@ -26,24 +26,24 @@ func (r *checkRepository) GetMany(ctx context.Context, userId int) ([]entity.Che
 	var checks []entity.Check
 
 	query := `SELECT id,
-       "name",
-       description,
-       "interval",
-       grace,
-       last_ping,
-       next_ping,
-       last_started,
-       status,
-       (SELECT json_agg(json_build_object(
-           'id', id,
-           'kind', kind,
-           'email', email,
-           'webhook_url_up', webhook_url_up,
-           'webhook_url_down', webhook_url_down
-       )) channels
-        FROM checks_channels
-        INNER JOIN channels on checks_channels.channel_id = channels.id
-        WHERE checks_channels.check_id = checks.id) channels
+      "name",
+      description,
+      "interval",
+      grace,
+      last_ping,
+      next_ping,
+      last_started,
+      status,
+      (SELECT json_agg(json_build_object(
+          'id', id,
+          'kind', kind,
+          'email', email,
+          'webhook_url_up', webhook_url_up,
+          'webhook_url_down', webhook_url_down
+      )) channels
+       FROM checks_channels
+       INNER JOIN channels on checks_channels.channel_id = channels.id
+       WHERE checks_channels.check_id = checks.id) channels
 		FROM checks
 		WHERE used_id = $1`
 	err := q.SelectContext(ctx, &checks, query, userId)
@@ -60,24 +60,24 @@ func (r *checkRepository) Get(ctx context.Context, params entity.GetCheck) (enti
 	var check entity.Check
 
 	query := `SELECT id,
-       "name",
-       description,
-       "interval",
-       grace,
-       last_ping,
-       next_ping,
-       last_started,
-       status,
-       (SELECT json_agg(json_build_object(
-           'id', id,
-           'kind', kind,
-           'email', email,
-           'webhook_url_up', webhook_url_up,
-           'webhook_url_down', webhook_url_down
-       ))
-        FROM checks_channels
-        INNER JOIN channels on checks_channels.channel_id = channels.id
-        WHERE checks_channels.check_id = checks.id) channels
+      "name",
+      description,
+      "interval",
+      grace,
+      last_ping,
+      next_ping,
+      last_started,
+      status,
+      (SELECT json_agg(json_build_object(
+          'id', id,
+          'kind', kind,
+          'email', email,
+          'webhook_url_up', webhook_url_up,
+          'webhook_url_down', webhook_url_down
+      ))
+       FROM checks_channels
+       INNER JOIN channels on checks_channels.channel_id = channels.id
+       WHERE checks_channels.check_id = checks.id) channels
 		FROM checks
 		WHERE id = $1 AND used_id = $2`
 	err := q.GetContext(ctx, &check, query, params.Id, params.UserId)
@@ -253,9 +253,9 @@ func (r *checkRepository) PingSuccess(ctx context.Context, checkId string, t tim
 
 	query := `UPDATE checks
 	SET last_ping    = $1,
-    	next_ping    = $1::timestamptz + (concat(interval, 's'))::interval,
-    	last_started = NULL,
-    	status       = 'up'
+   	next_ping    = $1::timestamptz + (concat(interval, 's'))::interval,
+   	last_started = NULL,
+   	status       = 'up'
 	WHERE id = $2`
 	result, err := q.ExecContext(ctx, query, t, checkId)
 	if err != nil {
@@ -279,7 +279,7 @@ func (r *checkRepository) PingStart(ctx context.Context, checkId string, t time.
 
 	query := `UPDATE checks
 	SET last_started = $1,
-    	status       = 'started'
+   	status       = 'started'
 	WHERE id = $2`
 	result, err := q.ExecContext(ctx, query, t, checkId)
 	if err != nil {
@@ -304,8 +304,8 @@ func (r *checkRepository) PingFail(ctx context.Context, checkId string, t time.T
 	query := `UPDATE checks
 	SET last_ping    = $1,
 	    next_ping    = NULL,
-    	last_started = NULL,
-    	status       = 'down'
+   	last_started = NULL,
+   	status       = 'down'
 	WHERE id = $2`
 	result, err := q.ExecContext(ctx, query, t, checkId)
 	if err != nil {
@@ -329,22 +329,20 @@ func (r *checkRepository) GetExpired(ctx context.Context) ([]entity.CheckExpired
 	var checks []entity.CheckExpired
 
 	query := `SELECT
-    ch.id,
-    "name",
-    next_ping, 
-    grace,
-    u.email,
-    (SELECT json_agg(json_build_object(
-           'kind', kind,
-           'email', email,
-           'webhook_url_up', webhook_url_up,
-           'webhook_url_down', webhook_url_down
-    )) channels
-    FROM checks_channels
-    INNER JOIN channels on checks_channels.channel_id = channels.id
-    WHERE checks_channels.check_id = ch.id) channels
-	FROM checks ch
-	INNER JOIN users u on u.id = ch.used_id
+   ch.id,
+   "name",
+   next_ping, 
+   grace,
+   (SELECT json_agg(json_build_object(
+          'kind', kind,
+          'email', email,
+          'webhook_url_up', webhook_url_up,
+          'webhook_url_down', webhook_url_down
+   )) channels
+   FROM checks_channels
+   INNER JOIN channels on checks_channels.channel_id = channels.id
+   WHERE checks_channels.check_id = ch.id) channels
+   FROM checks ch
 	WHERE status = 'up' AND current_timestamp > (next_ping + (concat(grace, 's'))::interval)
 	FOR UPDATE SKIP LOCKED`
 	err := q.SelectContext(ctx, &checks, query)
@@ -361,7 +359,7 @@ func (r *checkRepository) SetDown(ctx context.Context, checkIds []string) error 
 
 	query, args, err := sqlx.In(`UPDATE checks
 	SET next_ping    = NULL,
-    	status       = 'down'
+   	status       = 'down'
 	WHERE id IN (?);`, checkIds)
 	query = r.db.Rebind(query)
 	_, err = q.ExecContext(ctx, query, args...)

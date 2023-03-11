@@ -2,7 +2,6 @@ package channel
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
@@ -46,5 +45,5 @@ func (s *service) DeleteChannel(ctx context.Context, channel entity.DeleteChanne
 		}
 
 		return nil
-	}, sql.LevelDefault)
+	})
 }

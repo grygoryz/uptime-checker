@@ -2,7 +2,6 @@ package ping
 
 import (
 	"context"
-	"database/sql"
 	"gitlab.com/grygoryz/uptime-checker/internal/entity"
 	"gitlab.com/grygoryz/uptime-checker/internal/repository"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/errors"
@@ -78,5 +77,5 @@ func (s *service) CreatePing(ctx context.Context, ping entity.CreatePing) error 
 		}
 
 		return nil
-	}, sql.LevelDefault)
+	})
 }

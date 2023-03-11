@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/joho/godotenv"
-	"log"
+	"github.com/rs/zerolog/log"
 	"os"
 	"regexp"
 )
@@ -12,13 +12,14 @@ type Config struct {
 	Database Database
 	Redis    Redis
 	RabbitMQ RabbitMQ
+	Mailjet  Mailjet
 }
 
 func New(testing bool) Config {
 	re := regexp.MustCompile(`^(.*` + "uptime-checker" + `)`)
 	cwd, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Send()
 	}
 	rootPath := re.Find([]byte(cwd))
 
@@ -29,7 +30,7 @@ func New(testing bool) Config {
 
 	err = godotenv.Load(string(rootPath) + envFile)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Send()
 	}
 
 	return Config{
@@ -37,5 +38,6 @@ func New(testing bool) Config {
 		Database: databaseCfg(),
 		Redis:    redisCfg(),
 		RabbitMQ: rabbitMQCfg(),
+		Mailjet:  mailjetCfg(),
 	}
 }

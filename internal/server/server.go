@@ -6,13 +6,13 @@ import (
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	goredis "github.com/go-redis/redis/v9"
 	"github.com/jmoiron/sqlx"
+	"github.com/rs/zerolog/log"
 	"gitlab.com/grygoryz/uptime-checker/config"
 	"gitlab.com/grygoryz/uptime-checker/internal/middleware"
 	"gitlab.com/grygoryz/uptime-checker/internal/utility/logger"
 	"gitlab.com/grygoryz/uptime-checker/internal/validate"
 	"gitlab.com/grygoryz/uptime-checker/third_party/database"
 	"gitlab.com/grygoryz/uptime-checker/third_party/redis"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -74,16 +74,16 @@ func (s *Server) Run() {
 	}
 
 	go func() {
-		log.Printf("Serving at %s\n", s.httpServer.Addr)
+		log.Info().Msgf("Serving at %s\n", s.httpServer.Addr)
 		if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal(err)
+			log.Fatal().Err(err).Send()
 		}
 	}()
 
 	if err := s.gracefulShutdown(); err != nil {
-		log.Fatalf("Server shutdown failed: %+v", err)
+		log.Fatal().Msgf("Server shutdown failed: %+v", err)
 	}
-	log.Println("Server shutdown success.")
+	log.Info().Msg("Server shutdown success.")
 }
 
 func (s *Server) Router() *chi.Mux {
@@ -100,20 +100,20 @@ func (s *Server) gracefulShutdown() error {
 
 	<-quit
 
-	log.Println("Shutting down...")
+	log.Info().Msg("Shutting down...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), s.cfg.Api.GracefulTimeout)
 	defer func() {
 		cancel()
 		if err := s.db.Close(); err != nil {
-			log.Printf("Database shutdown failed: %+v\n", err)
+			log.Err(err).Msg("Database shutdown failed")
 		}
-		log.Println("Database shutdown success.")
+		log.Info().Msg("Database shutdown success.")
 
 		if err := s.redis.Close(); err != nil {
-			log.Printf("Redis shutdown failed: %+v\n", err)
+			log.Err(err).Msg("Redis shutdown failed")
 		}
-		log.Println("Redis shutdown success.")
+		log.Info().Msg("Redis shutdown success.")
 	}()
 
 	return s.httpServer.Shutdown(ctx)

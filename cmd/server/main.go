@@ -2,10 +2,10 @@ package main
 
 import (
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/rs/zerolog/log"
 	"gitlab.com/grygoryz/uptime-checker/config"
 	_ "gitlab.com/grygoryz/uptime-checker/docs"
 	"gitlab.com/grygoryz/uptime-checker/internal/server"
-	"log"
 )
 
 // @title Uptime Checker
@@ -14,7 +14,7 @@ import (
 // @in                         cookie
 // @name                       sessionId
 func main() {
-	log.Println("Starting server...")
+	log.Info().Msg("Starting server...")
 	cfg := config.New(false)
 	s := server.New(cfg)
 	s.Init()

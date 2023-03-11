@@ -2,7 +2,6 @@ package poller
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"github.com/jmoiron/sqlx"
 	"github.com/rs/zerolog/log"
@@ -46,8 +45,7 @@ loop:
 			break loop
 		default:
 			p.poll()
-			quit <- syscall.SIGINT
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 100)
 		}
 	}
 }
@@ -125,7 +123,7 @@ func (p *poller) poll() {
 		}
 
 		return nil
-	}, sql.LevelRepeatableRead)
+	})
 	if err != nil {
 		log.Err(err).Msg("Polling transaction error")
 	}
@@ -138,13 +136,13 @@ func (p *poller) sendToQueue(
 	newFlips []entity.CreateFlip,
 	flips []entity.FlipUnprocessed,
 ) error {
-	notifications := make([][]byte, len(expired)+len(flips))
+	notifications := make([][]byte, 0, len(expired)+len(flips))
 	for _, flip := range flips {
 		n := entity.Notification{
-			FlipTo:        string(flip.To),
+			CheckName:     flip.CheckName,
+			FlipTo:        entity.NotificationFlipStatus(flip.To),
 			FlipDate:      flip.Date,
 			CheckChannels: flip.CheckChannels,
-			UserEmail:     flip.UserEmail,
 		}
 		j, err := json.Marshal(n)
 		if err != nil {
@@ -154,10 +152,10 @@ func (p *poller) sendToQueue(
 	}
 	for i, check := range expired {
 		n := entity.Notification{
-			FlipTo:        string(newFlips[i].To),
+			CheckName:     check.Name,
+			FlipTo:        entity.NotificationFlipStatus(newFlips[i].To),
 			FlipDate:      newFlips[i].Date,
 			CheckChannels: check.Channels,
-			UserEmail:     check.UserEmail,
 		}
 		j, err := json.Marshal(n)
 		if err != nil {

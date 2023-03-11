@@ -3,8 +3,8 @@ package redis
 import (
 	"context"
 	"github.com/go-redis/redis/v9"
+	"github.com/rs/zerolog/log"
 	"gitlab.com/grygoryz/uptime-checker/config"
-	"log"
 )
 
 func New(cfg config.Config) *redis.Client {
@@ -12,7 +12,7 @@ func New(cfg config.Config) *redis.Client {
 
 	err := rdb.Ping(context.Background()).Err()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal().Err(err).Send()
 	}
 
 	return rdb
