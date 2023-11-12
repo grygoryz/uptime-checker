@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS flips;
+
+DROP TYPE IF EXISTS flip_state;

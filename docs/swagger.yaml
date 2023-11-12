@@ -1,0 +1,749 @@
+definitions:
+  auth.CheckResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+    required:
+    - email
+    - id
+    type: object
+  auth.SignInBody:
+    properties:
+      email:
+        maxLength: 320
+        type: string
+      password:
+        maxLength: 128
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.SignUpBody:
+    properties:
+      email:
+        maxLength: 320
+        type: string
+      password:
+        maxLength: 128
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  channel.CreateChannelBody:
+    properties:
+      email:
+        type: string
+      kind:
+        allOf:
+        - $ref: '#/definitions/entity.ChannelKind'
+        enum:
+        - email
+        - webhook
+      webhookURLDown:
+        type: string
+      webhookURLUp:
+        type: string
+    required:
+    - kind
+    type: object
+  channel.CreateChannelResponse:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  channel.GetChannelsResponseItem:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      kind:
+        $ref: '#/definitions/entity.ChannelKind'
+      webhookURLDown:
+        type: string
+      webhookURLUp:
+        type: string
+    required:
+    - id
+    - kind
+    type: object
+  channel.UpdateChannelBody:
+    properties:
+      email:
+        type: string
+      kind:
+        allOf:
+        - $ref: '#/definitions/entity.ChannelKind'
+        enum:
+        - email
+        - webhook
+      webhookURLDown:
+        type: string
+      webhookURLUp:
+        type: string
+    required:
+    - kind
+    type: object
+  check.Channel:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      kind:
+        $ref: '#/definitions/entity.ChannelKind'
+      webhookURLDown:
+        type: string
+      webhookURLUp:
+        type: string
+    required:
+    - id
+    - kind
+    type: object
+  check.Check:
+    properties:
+      channels:
+        items:
+          $ref: '#/definitions/check.Channel'
+        type: array
+      description:
+        type: string
+      grace:
+        type: integer
+      id:
+        type: string
+      interval:
+        type: integer
+      lastPing:
+        type: string
+      lastStarted:
+        type: string
+      name:
+        type: string
+      nextPing:
+        type: string
+      status:
+        $ref: '#/definitions/entity.CheckStatus'
+    required:
+    - channels
+    - description
+    - grace
+    - id
+    - interval
+    - name
+    - status
+    type: object
+  check.CreateCheckBody:
+    properties:
+      channels:
+        items:
+          type: integer
+        minItems: 1
+        type: array
+      description:
+        maxLength: 528
+        type: string
+      grace:
+        description: min 1 minute, max 1 year
+        maximum: 31536000
+        minimum: 60
+        type: integer
+      interval:
+        description: min 1 minute, max 1 year
+        maximum: 31536000
+        minimum: 60
+        type: integer
+      name:
+        maxLength: 128
+        type: string
+    required:
+    - channels
+    - description
+    - grace
+    - interval
+    - name
+    type: object
+  check.CreateCheckResponse:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  check.Flip:
+    properties:
+      date:
+        type: string
+      to:
+        $ref: '#/definitions/entity.FlipState'
+    required:
+    - date
+    - to
+    type: object
+  check.GetFlipsResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/check.Flip'
+        type: array
+      total:
+        type: integer
+    required:
+    - items
+    - total
+    type: object
+  check.GetPingsResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/check.Ping'
+        type: array
+      total:
+        type: integer
+    required:
+    - items
+    - total
+    type: object
+  check.Ping:
+    properties:
+      body:
+        type: string
+      date:
+        type: string
+      duration:
+        type: integer
+      id:
+        type: integer
+      source:
+        type: string
+      type:
+        $ref: '#/definitions/entity.PingKind'
+      userAgent:
+        type: string
+    required:
+    - date
+    - id
+    - source
+    - type
+    - userAgent
+    type: object
+  check.UpdateCheckBody:
+    properties:
+      channels:
+        items:
+          type: integer
+        minItems: 1
+        type: array
+      description:
+        maxLength: 528
+        type: string
+      grace:
+        description: min 1 minute, max 1 year
+        maximum: 31536000
+        minimum: 60
+        type: integer
+      interval:
+        description: min 1 minute, max 1 year
+        maximum: 31536000
+        minimum: 60
+        type: integer
+      name:
+        maxLength: 128
+        type: string
+    required:
+    - channels
+    - description
+    - grace
+    - interval
+    - name
+    type: object
+  entity.ChannelKind:
+    enum:
+    - email
+    - webhook
+    type: string
+    x-enum-varnames:
+    - EmailChannel
+    - WebhookChannel
+  entity.CheckStatus:
+    enum:
+    - new
+    - started
+    - up
+    - down
+    - paused
+    type: string
+    x-enum-varnames:
+    - CheckNew
+    - CheckStarted
+    - CheckUp
+    - CheckDown
+    - CheckPaused
+  entity.FlipState:
+    enum:
+    - up
+    - down
+    - paused
+    type: string
+    x-enum-varnames:
+    - FlipUp
+    - FlipDown
+    - FlipPaused
+  entity.PingKind:
+    enum:
+    - start
+    - success
+    - fail
+    type: string
+    x-enum-varnames:
+    - PingStart
+    - PingSuccess
+    - PingFail
+info:
+  contact: {}
+  title: Uptime Checker
+  version: 0.0.1
+paths:
+  /v1/auth/check:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.CheckResponse'
+      security:
+      - cookieAuth: []
+      summary: Check user data
+      tags:
+      - Auth
+  /v1/auth/signin:
+    put:
+      consumes:
+      - application/json
+      description: Sets cookie "sessionId" on response
+      parameters:
+      - description: user credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignInBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Sign in
+      tags:
+      - Auth
+  /v1/auth/signout:
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - cookieAuth: []
+      summary: Sign out
+      tags:
+      - Auth
+  /v1/auth/signup:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignUpBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Sign up
+      tags:
+      - Auth
+  /v1/channels:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/channel.GetChannelsResponseItem'
+            type: array
+      security:
+      - cookieAuth: []
+      summary: Get channels
+      tags:
+      - Channels
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: channel data
+        in: body
+        name: channel
+        required: true
+        schema:
+          $ref: '#/definitions/channel.CreateChannelBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/channel.CreateChannelResponse'
+      security:
+      - cookieAuth: []
+      summary: Create channel
+      tags:
+      - Channels
+  /v1/channels/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: channel id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - cookieAuth: []
+      summary: Delete channel
+      tags:
+      - Channels
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: channel id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: channel data
+        in: body
+        name: channel
+        required: true
+        schema:
+          $ref: '#/definitions/channel.UpdateChannelBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - cookieAuth: []
+      summary: Update channel
+      tags:
+      - Channels
+  /v1/checks:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/check.Check'
+            type: array
+      security:
+      - cookieAuth: []
+      summary: Get checks
+      tags:
+      - Checks
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: check data
+        in: body
+        name: check
+        required: true
+        schema:
+          $ref: '#/definitions/check.CreateCheckBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/check.CreateCheckResponse'
+      security:
+      - cookieAuth: []
+      summary: Create check
+      tags:
+      - Checks
+  /v1/checks/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - cookieAuth: []
+      summary: Delete check
+      tags:
+      - Checks
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/check.Check'
+      security:
+      - cookieAuth: []
+      summary: Get check
+      tags:
+      - Checks
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: check data
+        in: body
+        name: check
+        required: true
+        schema:
+          $ref: '#/definitions/check.UpdateCheckBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - cookieAuth: []
+      summary: Update check
+      tags:
+      - Checks
+  /v1/checks/{id}/flips:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      - in: query
+        name: from
+        required: true
+        type: integer
+      - in: query
+        maximum: 50
+        minimum: 1
+        name: limit
+        required: true
+        type: integer
+      - in: query
+        name: offset
+        required: true
+        type: integer
+      - in: query
+        name: to
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/check.GetFlipsResponse'
+      security:
+      - cookieAuth: []
+      summary: Get flips
+      tags:
+      - Checks
+  /v1/checks/{id}/pause:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - cookieAuth: []
+      summary: Pause check
+      tags:
+      - Checks
+  /v1/checks/{id}/pings:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: check id
+        in: path
+        name: id
+        required: true
+        type: string
+      - in: query
+        name: from
+        required: true
+        type: integer
+      - in: query
+        maximum: 50
+        minimum: 1
+        name: limit
+        required: true
+        type: integer
+      - in: query
+        name: offset
+        required: true
+        type: integer
+      - in: query
+        name: to
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/check.GetPingsResponse'
+      security:
+      - cookieAuth: []
+      summary: Get pings
+      tags:
+      - Checks
+  /v1/pings/{checkId}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        schema:
+          type: string
+      - description: check id
+        in: path
+        name: checkId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Create success ping
+      tags:
+      - Pings
+  /v1/pings/{checkId}/fail:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        schema:
+          type: string
+      - description: check id
+        in: path
+        name: checkId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Create fail ping
+      tags:
+      - Pings
+  /v1/pings/{checkId}/start:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        schema:
+          type: string
+      - description: check id
+        in: path
+        name: checkId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Create start ping
+      tags:
+      - Pings
+securityDefinitions:
+  cookieAuth:
+    in: cookie
+    name: sessionId
+    type: apiKey
+swagger: "2.0"

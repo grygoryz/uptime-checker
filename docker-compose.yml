@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14.1
+    environment:
+      - POSTGRES_DB=uptime_checker
+      - POSTGRES_USER=uptime_checker
+      - POSTGRES_PASSWORD=123123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.0.7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/data
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  postgres:
+  redis:
